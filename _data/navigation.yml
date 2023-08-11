@@ -1,9 +1,27 @@
 main:
-  - title: "Posts"
-    url: /posts/
-  - title: "Categories"
-    url: /categories/
-  - title: "Tags"
-    url: /tags/
+  - title: "Python for Ecologists"
+    url:  python_0_landing_page
+  - title: "R for Ecologists"
+    url: /0_r_landing_page/
   - title: "About"
-    url: /about/
+    url:  about
+
+r:
+  - title: "Basics of R"
+    url: /1_r_basics/
+  - title: "Data Visualization"
+    url: /2_r_data_viz/
+  - title: "Interpolation and Gap Filling"
+    url: /3_r_interp_gapfil/
+  - title: "Extreme Value Detection"
+    url: "/4_r_extreme_detection/"
+
+python:
+  - title: "Basics of Python"
+    url: /_pages/python_course/1_python_basics/
+  - title: "Data Visualization"
+    url: /_pages/python_course/2_data_viz/
+  - title: "Interpolation and Gap Filling"
+    url: /_pages/python_course/3_interp_gapfil/
+  - title: "Extreme Value Detection"
+    url: "/4_extreme_detection/"

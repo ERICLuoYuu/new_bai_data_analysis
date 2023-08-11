@@ -1,0 +1,1094 @@
+<!doctype html>
+<!--
+  Minimal Mistakes Jekyll Theme 4.24.0 by Michael Rose
+  Copyright 2013-2020 Michael Rose - mademistakes.com | @mmistakes
+  Free for personal and commercial use under the MIT license
+  https://github.com/mmistakes/minimal-mistakes/blob/master/LICENSE
+-->
+<html lang="en" class="no-js">
+  <head>
+    <meta charset="utf-8">
+
+<!-- begin _includes/seo.html --><title>  Basics of R - Data Analysis for Ecologists</title>
+<meta name="description" content="Write an awesome description for your new site here. You can edit this line in _config.yml. It will appear in your document head meta (for Google search results) and in your feed.xml site description.">
+
+
+  <meta name="author" content="Nicolas Behrens">
+  
+
+
+<meta property="og:type" content="website">
+<meta property="og:locale" content="en_US">
+<meta property="og:site_name" content="Data Analysis for Ecologists">
+<meta property="og:title" content="  Basics of R">
+<meta property="og:url" content="http://localhost:4000/1_r_basics/">
+
+
+  <meta property="og:description" content="Write an awesome description for your new site here. You can edit this line in _config.yml. It will appear in your document head meta (for Google search results) and in your feed.xml site description.">
+
+
+
+
+
+
+
+
+
+
+
+
+<link rel="canonical" href="http://localhost:4000/1_r_basics/">
+
+
+
+
+<script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    
+      "@type": "Person",
+      "name": null,
+      "url": "http://localhost:4000/"
+    
+  }
+</script>
+
+
+
+
+
+
+
+<!-- end _includes/seo.html -->
+
+
+
+  <link href="/feed.xml" type="application/atom+xml" rel="alternate" title="Data Analysis for Ecologists Feed">
+
+
+<!-- https://t.co/dKP3o1e -->
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<script>
+  document.documentElement.className = document.documentElement.className.replace(/\bno-js\b/g, '') + ' js ';
+</script>
+
+<!-- For all browsers -->
+<link rel="stylesheet" href="/assets/css/main.css">
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5/css/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+<noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5/css/all.min.css"></noscript>
+
+
+
+    <!-- start custom head snippets -->
+
+<!-- insert favicons. use https://realfavicongenerator.net/ -->
+
+<!-- end custom head snippets -->
+
+  </head>
+
+  <body class="layout--single">
+    <nav class="skip-links">
+  <ul>
+    <li><a href="#site-nav" class="screen-reader-shortcut">Skip to primary navigation</a></li>
+    <li><a href="#main" class="screen-reader-shortcut">Skip to content</a></li>
+    <li><a href="#footer" class="screen-reader-shortcut">Skip to footer</a></li>
+  </ul>
+</nav>
+
+    
+
+<div class="masthead">
+  <div class="masthead__inner-wrap">
+    <div class="masthead__menu">
+      <nav id="site-nav" class="greedy-nav">
+        
+        <a class="site-title" href="/">
+          Data Analysis for Ecologists
+          
+        </a>
+        <ul class="visible-links"><li class="masthead__menu-item">
+              <a href="/python_0_landing_page">Python for Ecologists</a>
+            </li><li class="masthead__menu-item">
+              <a href="/0_r_landing_page/">R for Ecologists</a>
+            </li><li class="masthead__menu-item">
+              <a href="/about">About</a>
+            </li></ul>
+        
+        <button class="search__toggle" type="button">
+          <span class="visually-hidden">Toggle search</span>
+          <i class="fas fa-search"></i>
+        </button>
+        
+        <button class="greedy-nav__toggle hidden" type="button">
+          <span class="visually-hidden">Toggle menu</span>
+          <div class="navicon"></div>
+        </button>
+        <ul class="hidden-links hidden"></ul>
+      </nav>
+    </div>
+  </div>
+</div>
+
+
+    <div class="initial-content">
+      
+
+
+
+
+
+<div id="main" role="main">
+  
+  <div class="sidebar sticky">
+  
+
+
+<div itemscope itemtype="https://schema.org/Person" class="h-card">
+
+  
+    <div class="author__avatar">
+      <a href="http://localhost:4000/">
+        <img src="/assets/images/bio-photo.jpg" alt="Nicolas Behrens" itemprop="image" class="u-photo">
+      </a>
+    </div>
+  
+
+  <div class="author__content">
+    <h3 class="author__name p-name" itemprop="name">
+      <a class="u-url" rel="me" href="http://localhost:4000/" itemprop="url">Nicolas Behrens</a>
+    </h3>
+    
+      <div class="author__bio p-note" itemprop="description">
+        <p>I am a Geoscientist, Java developer and now Ecology PhD-candidate. I love programming, working with time series data and being in my beautiful peatland research sites where I investigate controls on greenhouse gas emissions from peat soils.</p>
+
+      </div>
+    
+  </div>
+
+  <div class="author__urls-wrapper">
+    <button class="btn btn--inverse">Follow</button>
+    <ul class="author__urls social-icons">
+      
+
+      
+        
+          
+            <li><a href="https://github.com/nicbehr" rel="nofollow noopener noreferrer me" itemprop="sameAs"><i class="fab fa-fw fa-github" aria-hidden="true"></i><span class="label">GitHub</span></a></li>
+          
+        
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      <!--
+  <li>
+    <a href="http://link-to-whatever-social-network.com/user/" itemprop="sameAs" rel="nofollow noopener noreferrer me">
+      <i class="fas fa-fw" aria-hidden="true"></i> Custom Social Profile Link
+    </a>
+  </li>
+-->
+    </ul>
+  </div>
+</div>
+
+  
+    
+      
+      
+      
+      
+    
+    
+      
+
+<nav class="nav__list">
+  
+  <input id="ac-toc" name="accordion-toc" type="checkbox" />
+  <label for="ac-toc">Toggle Menu</label>
+  <ul class="nav__items">
+    
+      <li>
+        
+          <a href="/1_r_basics/"><span class="nav__sub-title">Basics of R</span></a>
+        
+
+        
+      </li>
+    
+      <li>
+        
+          <a href="/2_r_data_viz/"><span class="nav__sub-title">Data Visualization</span></a>
+        
+
+        
+      </li>
+    
+      <li>
+        
+          <a href="/3_r_interp_gapfil/"><span class="nav__sub-title">Interpolation and Gap Filling</span></a>
+        
+
+        
+      </li>
+    
+      <li>
+        
+          <a href="/4_r_extreme_detection/"><span class="nav__sub-title">Extreme Value Detection</span></a>
+        
+
+        
+      </li>
+    
+  </ul>
+</nav>
+
+    
+  
+  </div>
+
+
+
+  <article class="page h-entry" itemscope itemtype="https://schema.org/CreativeWork">
+    <meta itemprop="headline" content="  Basics of R">
+    
+    
+    
+
+    <div class="page__inner-wrap">
+      
+        <header>
+          <h1 id="page-title" class="page__title p-name" itemprop="headline">
+            <a href="http://localhost:4000/1_r_basics/" class="u-url" itemprop="url"><ol>
+  <li>Basics of R</li>
+</ol>
+</a>
+          </h1>
+          
+
+
+        </header>
+      
+
+      <section class="page__content e-content" itemprop="text">
+        
+        <p>This interactive tutorial will get you started on your data-exploration road and make you familiar with some core
+concepts of R and programming.</p>
+
+<h4 id="table-of-contents">Table of Contents</h4>
+<ol>
+  <li><a href="#1-data-types-and-variables">Data Types and Variables</a></li>
+  <li><a href="#2-operators">Operators</a></li>
+  <li><a href="#3-functions">Functions</a></li>
+  <li><a href="#4-data-structures">Data Structures</a></li>
+  <li><a href="#5-visualizing-data">Visualizing Data</a></li>
+  <li><a href="#6-extra-loops-and-conditionals">Extra: Loops and Conditionals</a></li>
+</ol>
+
+<p>Notice that it is not at all expected that you learn all these things and they are burnt into your brain (!!!!!). 
+It is more of a broad intrdocution to all the basics so you have hard of them, but programmers do look up stuff
+all the time! So don’t worry if it is a lot of input right now, just try to understand the concepts and you 
+can always come back and find help in here, in the internet or from me directly.</p>
+
+<p>Here are some useful ressources if you get stuck:</p>
+
+<p><a href="https://www.tutorialkart.com/r-tutorial/">Link: A general tutorial on several topics</a></p>
+
+<p><a href="https://www.javatpoint.com/r-built-in-functions">Link: A comprehensive list of built-in functions</a></p>
+
+<p>and last but not least, if you need help with a specific function (we will talk about functions later), you can 
+use the nice inbuilt method help(). For example you can run help(paste) and will directly see the documentation
+for that function</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>help(paste)
+</code></pre></div></div>
+
+<h3 id="1-data-types-and-variables">1. Data Types and Variables</h3>
+<p>To work with data of course we somehow have to create or read data to work on.
+In programming when we say that we “assign”, it means that we define a variable name and
+give it a certain value. In the following example you see four assignments of different values to
+variable names:</p>
+
+<div class="language-R highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">a</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">5</span><span class="w"> </span><span class="c1"># &lt;-- the variable "a" has the value 5</span><span class="w">
+</span><span class="n">b</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">6.1</span><span class="w"> </span><span class="c1"># the variable "b" has the value 6.1</span><span class="w">
+</span><span class="n">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"lucas"</span><span class="w"> </span><span class="c1"># the variable "name" has the value "lucas"</span><span class="w">
+</span><span class="n">truth</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">TRUE</span><span class="w"> </span><span class="c1"># the variable truth has the value TRUE</span><span class="w">
+</span></code></pre></div></div>
+
+<p>Now lets take a look at these variables. You can show them below the cell by just writing their name:</p>
+<div class="language-R highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">a</span><span class="w">
+</span><span class="n">b</span><span class="w">
+</span><span class="n">name</span><span class="w">
+</span><span class="n">truth</span><span class="w">
+</span></code></pre></div></div>
+<p>Ouput:</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>5
+6.1
+'lucas'
+TRUE
+</code></pre></div></div>
+
+<p>You can probably already see that the values of these variables are a bit different. We have numbers, 
+numbers with decimals, some letters and the strange “TRUE”-value. We will not talk about data types 
+in depth but knowing some basics is very helpful for your future tasks, so lets have a look at some of them. 
+As a little exercise you can run the following code and take a look at the output in the console:</p>
+
+<div class="language-R highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">typeof</span><span class="p">(</span><span class="n">a</span><span class="p">)</span><span class="w">
+</span><span class="n">typeof</span><span class="p">(</span><span class="n">b</span><span class="p">)</span><span class="w">
+</span><span class="n">typeof</span><span class="p">(</span><span class="n">name</span><span class="p">)</span><span class="w">
+</span><span class="n">typeof</span><span class="p">(</span><span class="n">truth</span><span class="p">)</span><span class="w">
+</span></code></pre></div></div>
+<p>Ouput:</p>
+<div class="language-R highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="s1">'double'</span><span class="w">
+</span><span class="s1">'double'</span><span class="w">
+</span><span class="s1">'character'</span><span class="w">
+</span><span class="s1">'logical'</span><span class="w">
+</span></code></pre></div></div>
+
+<p>What you see are the different types that the values of the variables have. In R there are 6 types
+of data but for us right now only 3 of them are of interest for us:</p>
+
+<ol>
+  <li>
+    <p><strong>double</strong>: In simple terms, a double is a number that has decimals. But since double is also the
+default type assigned to values that do not have decimals, we will ignore other numeric
+types for now.</p>
+  </li>
+  <li>
+    <p><strong>character</strong>: a character basically represents letters. If you have a series of characters together (like a
+word) we call it a “string”. So ’a’ is a character but “apple” is a string</p>
+  </li>
+  <li>
+    <p><strong>logical</strong>: the logical type is the one of our three that is not intuitive from everyday life. It is a value
+that can only have two states: TRUE or FALSE (often times also 1 or 0 which represents
+the same). We will come back to that when we talk about operators in the next chapter.</p>
+  </li>
+</ol>
+
+<h3 id="2-operators">2. Operators</h3>
+
+<p>Now that we have some variables it is time to do something with them. There are several
+operations that you can do in R. The basic arithmetic operators (“mathematical” operators) are
++, -, *, / and **. They do pretty much exactly what you would expect: add, subtract, multiply,
+divide and finally (maybe not so obvious) exponentiation. You can run the following in your editor
+and see the output in the console below:</p>
+<div class="language-R highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">a</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">b</span><span class="w">
+</span><span class="n">b</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">a</span><span class="w">
+</span><span class="n">a</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">b</span><span class="w">
+</span><span class="n">b</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="n">a</span><span class="w">
+</span><span class="n">a</span><span class="w"> </span><span class="o">**</span><span class="w"> </span><span class="m">2</span><span class="w">
+</span></code></pre></div></div>
+<p>Output:</p>
+<div class="language-R highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="m">11.1</span><span class="w">
+</span><span class="m">1.1</span><span class="w">
+</span><span class="m">30.5</span><span class="w">
+</span><span class="m">1.22</span><span class="w">
+</span><span class="m">25</span><span class="w">
+</span></code></pre></div></div>
+<p>Notice that we did not store the results in a variable. If we want to have access to the results 
+later in the script we need to assign the results to variables like this:</p>
+<div class="language-R highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">c</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">a</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">b</span><span class="w">
+</span><span class="n">c</span><span class="w">
+</span></code></pre></div></div>
+<p>Output:</p>
+<div class="language-R highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="m">11.1</span><span class="w">
+</span></code></pre></div></div>
+
+<p>Since only very basic operations are implemented in the core language like this, there are a lot of convenient
+methods already implemented in R that make your life easier, for example when you want to take the square root 
+of something.</p>
+<div class="language-R highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nf">sqrt</span><span class="p">(</span><span class="m">36</span><span class="p">)</span><span class="w">
+</span></code></pre></div></div>
+<p>Ouput:</p>
+<div class="language-R highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="m">6</span><span class="w">
+</span></code></pre></div></div>
+<p>you can find a nice overview of (mathematical and other) embedded functions here:
+https://www.javatpoint.com/r-built-in-functions</p>
+
+<hr />
+<h3 id="exercise">Exercise:</h3>
+<ol>
+  <li>
+    <p>For the following list of values, calculate the mean 
+5, 20, 32, 12, 20, 50, 78, 34, 127</p>
+  </li>
+  <li>
+    <p>Imagine you have a right angled triangle with two side lengths 32cm and 45cm. 
+Given the third side is the hypothenuse, calculate the length of the third site:</p>
+  </li>
+</ol>
+
+<hr />
+
+<p>Another important set of operators are the “logical” operators. They are used to find out whether 
+a condition is true or false. Here we come back to the “logical” type.  Logical operators in R and 
+most other programming languages are:
+== means equal to
+&gt; means greater than
+&lt; means less than
+&gt;= means greater than or equal to
+&lt;= means less than or equal to
+!= means NOT equal to
+generally a ! inverts a logical question. = means equal, != means not equal. &gt; means greater than, !&gt; means 
+NOT greater than</p>
+
+<p>The output from questions like this is a value of type “logical”, for example:</p>
+<div class="language-R highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">is10GreaterThan11</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">10</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="m">11</span><span class="w">
+</span><span class="n">is10GreaterThan11</span><span class="w">
+</span><span class="n">typeof</span><span class="p">(</span><span class="n">is10GreaterThan11</span><span class="p">)</span><span class="w">
+</span></code></pre></div></div>
+<p>Output:</p>
+<div class="language-R highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kc">FALSE</span><span class="w">
+</span><span class="s1">'logical'</span><span class="w">
+</span></code></pre></div></div>
+<p>Additionally there are operators that concatenate logical operations:
+&amp; is the AND operator: checks whether both the statement before AND after the sign are true
+| is the  OR operator: checks whether the statement before OR after the sign are true. It is also
+true, when both are true. Here are some examples:</p>
+<div class="language-R highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="m">5</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="m">4</span><span class="w"> </span><span class="o">&amp;</span><span class="w"> </span><span class="m">3</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="m">1</span><span class="w">
+</span><span class="s2">"lucas"</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="s2">"lukas"</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="m">5</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="m">4</span><span class="w">
+</span><span class="n">isRaining</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">FALSE</span><span class="w">
+</span><span class="n">isInShower</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">TRUE</span><span class="w">
+</span><span class="n">youGetWet</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">isRaining</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="n">isInShower</span><span class="w">
+</span><span class="n">youGetWet</span><span class="w">
+</span><span class="n">isRaining</span><span class="w"> </span><span class="o">&amp;</span><span class="w"> </span><span class="n">isInShower</span><span class="w">
+</span></code></pre></div></div>
+<p>Ouput:</p>
+<div class="language-R highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kc">FALSE</span><span class="w">
+</span><span class="kc">TRUE</span><span class="w">
+</span><span class="kc">TRUE</span><span class="w">
+</span><span class="kc">FALSE</span><span class="w">
+</span></code></pre></div></div>
+<hr />
+<h3 id="exercise-1">Exercise:</h3>
+
+<p>To get some practice lets try some code examples. In the cell below, try to figure out which output you expect before
+running the code and see, how many you get correct.</p>
+<div class="language-R highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">a</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">5</span><span class="w"> 
+</span><span class="n">b</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">6.1</span><span class="w"> 
+</span><span class="n">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"lucas"</span><span class="w"> 
+</span><span class="n">truth</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">TRUE</span><span class="w"> 
+
+</span><span class="n">a</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="n">b</span><span class="w">
+</span><span class="n">c</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="n">a</span><span class="w">
+</span><span class="p">(</span><span class="n">c</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="n">a</span><span class="p">)</span><span class="w"> </span><span class="o">&amp;</span><span class="w"> </span><span class="p">(</span><span class="n">b</span><span class="o">+</span><span class="n">c</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="n">a</span><span class="p">)</span><span class="w"> 
+</span><span class="n">name</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="s1">'lucas'</span><span class="w">
+</span><span class="p">(</span><span class="n">name</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="s1">'peter'</span><span class="p">)</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="o">!</span><span class="n">truth</span><span class="w">
+</span><span class="p">((</span><span class="n">a</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">b</span><span class="p">)</span><span class="w"> </span><span class="o">&amp;</span><span class="w"> </span><span class="n">name</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="s2">"lucas"</span><span class="w"> </span><span class="o">&amp;</span><span class="w"> </span><span class="o">!</span><span class="n">truth</span><span class="p">)</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="p">(</span><span class="n">truth</span><span class="w"> </span><span class="o">&amp;</span><span class="w"> </span><span class="p">(</span><span class="n">b</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="m">9999</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="n">b</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="m">10</span><span class="p">))</span><span class="w"> </span><span class="c1"># &lt;-- advanced, if you get stuck leave it out ;)</span><span class="w">
+</span></code></pre></div></div>
+<details>
+<summary>Solution</summary>
+FALSE
+TRUE
+TRUE
+TRUE
+FALSE
+TRUE
+</details>
+
+<hr />
+
+<h3 id="3-functions">3. Functions</h3>
+
+<p>Functions are a super important and useful concept in programming. They are pieces of code that are written
+to perform a specific task. You have already seen the function sqrt(). 
+But we can also easily define our own programs and use them again and again once they are set up. 
+Lets see a little example first:</p>
+<div class="language-R highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">add</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">function</span><span class="p">(</span><span class="n">a</span><span class="p">,</span><span class="w"> </span><span class="n">b</span><span class="p">){</span><span class="w">
+    </span><span class="n">result</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">a</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">b</span><span class="w">
+    </span><span class="n">print</span><span class="p">(</span><span class="n">result</span><span class="p">)</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre></div></div>
+<p>Functions always starts just like any other assignment with the (descriptive) name you want to give to your 
+function in this case “add” (because the function adds two numbers). After the qual sign we say that this is going to
+be a function with the keyword “function”, makes sense right? Then we have round brackets
+with two parameters in there, a and b. These are the parameters that we need inside the function. When we want to
+use the function, we need to pass these two values in. 
+Behind the brackets you see the curly braces. Between these we can define the “function body”, which contains 
+all the functionality you want the function to have. Here we define a third variable, result, 
+and then use the “print” keyword to show the result.</p>
+
+<p>Now that the function is defined we can use it like this:</p>
+<div class="language-R highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">x</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">5</span><span class="w">
+</span><span class="n">y</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">10</span><span class="w">
+</span><span class="n">add</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">)</span><span class="w">
+</span></code></pre></div></div>
+<p>Ouput:</p>
+<div class="language-R highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="m">15</span><span class="w">
+</span></code></pre></div></div>
+<p>Executing a function like this is called “calling” a function. Here we “call” the add function with parameters x and y.
+Notice that x and y don’t need to have the same name as the paramteres in the function. The names of the parameters
+in the function only have to be consistent INSIDE the function.</p>
+
+<p>One important keyword inside functions is “return”. If you want to 
+do something in the function and then use the result outside of your function, you have to return the value. Otherwise
+whatever is done in the function, stays in there. We can easily modify the above function like this:</p>
+<div class="language-R highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">add</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">function</span><span class="p">(</span><span class="n">a</span><span class="p">,</span><span class="w"> </span><span class="n">b</span><span class="p">){</span><span class="w">
+    </span><span class="n">result</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">a</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">b</span><span class="w">
+    </span><span class="nf">return</span><span class="p">(</span><span class="n">result</span><span class="p">)</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre></div></div>
+<p>Now we can store the result like this:</p>
+<div class="language-R highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">z</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">add</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">)</span><span class="w">
+</span><span class="n">z</span><span class="w">
+</span></code></pre></div></div>
+<p>Ouput:</p>
+<div class="language-R highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="m">15</span><span class="w">
+</span></code></pre></div></div>
+<p>So now you are ready to define your own functions.</p>
+
+<hr />
+<h3 id="exercise-2">Exercise:</h3>
+<ol>
+  <li>
+    <p>Write your own functions for some easy mathematical procedures. Write one for subtraction, divison and multiplication.</p>
+  </li>
+  <li>
+    <p>As a little extra (if you want), you can write a classical “hello” function. It is a function that takes a 
+string as a parameter, e.g. a name, and prints out a greeting, e.g. “Hello Lucas”. 
+Hint: To concatenate strings you need another function that is built in. It is called paste(). You can find a little
+description here: https://www.rdocumentation.org/packages/base/versions/3.6.2/topics/paste</p>
+  </li>
+</ol>
+
+<hr />
+<h3 id="4-data-structures">4. Data structures</h3>
+
+<p>This topic will be a little bit more advanced but it is super important when you want to work with real data. 
+Besides the basic data types that you already saw there are special constructs that allow you to save more than one
+value. The structures we will talk about here are vectors and dataframes.</p>
+
+<h4 id="41-vectors">4.1 Vectors</h4>
+
+<p>First lets see how to define a vector. A vector is just a one-dimensional array of values (basically a list).
+The most common function in R to define a vector is c(). You can pass all kinds of data types to the c() function
+and it will give you a vector of the passed in types:</p>
+<div class="language-R highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">numericVector</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nf">c</span><span class="p">(</span><span class="m">1</span><span class="p">,</span><span class="m">2</span><span class="p">,</span><span class="m">3</span><span class="p">,</span><span class="m">4</span><span class="p">,</span><span class="m">5</span><span class="p">)</span><span class="w">
+</span><span class="n">stringVector</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nf">c</span><span class="p">(</span><span class="s2">"lucas"</span><span class="p">,</span><span class="w"> </span><span class="s2">"peter"</span><span class="p">,</span><span class="w"> </span><span class="s2">"marie"</span><span class="p">,</span><span class="w"> </span><span class="s2">"laura"</span><span class="p">)</span><span class="w">
+</span><span class="n">numericVector</span><span class="w">
+</span><span class="n">stringVector</span><span class="w">
+</span></code></pre></div></div>
+<p>Ouput:</p>
+<div class="language-R highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="m">1</span><span class="w">
+</span><span class="m">2</span><span class="w">
+</span><span class="m">3</span><span class="w">
+</span><span class="m">4</span><span class="w">
+</span><span class="m">5</span><span class="w">
+
+</span><span class="s1">'lucas'</span><span class="w">
+</span><span class="s1">'peter'</span><span class="w">
+</span><span class="s1">'marie'</span><span class="w">
+</span><span class="s1">'laura'</span><span class="w">
+
+</span></code></pre></div></div>
+
+<p>You can find the length of a vector by using the length() function:</p>
+<div class="language-R highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nf">length</span><span class="p">(</span><span class="n">numericVector</span><span class="p">)</span><span class="w">
+</span></code></pre></div></div>
+<p>Ouput:</p>
+<div class="language-R highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="m">5</span><span class="w">
+</span></code></pre></div></div>
+
+<hr />
+<h3 id="exercise-3">Exercise:</h3>
+<p>Time for another convenience function: sum() 
+you can simply pass a vector into this function to compute the sum of all values in the vector
+Using your new accquired skills, calculate the mean for the numericVector</p>
+
+<hr />
+
+<p>After you have defined vectors, you can get single values from your vectors by their “indices”. In R, the first index
+is the number 1 (in many other languages it is 0). The index is accessed with square brackets like this:</p>
+<div class="language-R highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">numericVector</span><span class="p">[</span><span class="m">1</span><span class="p">]</span><span class="w">
+</span><span class="n">stringVector</span><span class="p">[</span><span class="m">2</span><span class="p">]</span><span class="w">
+</span></code></pre></div></div>
+<p>Output:</p>
+<div class="language-R highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="m">1</span><span class="w">
+</span><span class="s1">'peter'</span><span class="w">
+</span></code></pre></div></div>
+
+<p>You can also access several values. If they are consecutive you can use “:” as a from-to operator:</p>
+<div class="language-R highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">stringVector</span><span class="p">[</span><span class="m">1</span><span class="o">:</span><span class="m">3</span><span class="p">]</span><span class="w">
+</span></code></pre></div></div>
+<p>Output:</p>
+<div class="language-R highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="s1">'lucas'</span><span class="w">
+</span><span class="s1">'peter'</span><span class="w">
+</span><span class="err">'</span><span class="n">marie</span><span class="w">
+</span></code></pre></div></div>
+<p>If you want to get single entries from different indices you can use another vector as list of indices like this:</p>
+<div class="language-R highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">numericVector</span><span class="p">[</span><span class="nf">c</span><span class="p">(</span><span class="m">1</span><span class="p">,</span><span class="m">4</span><span class="p">,</span><span class="m">5</span><span class="p">)]</span><span class="w">
+</span></code></pre></div></div>
+<p>Output:</p>
+<div class="language-R highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="m">1</span><span class="w">
+</span><span class="m">4</span><span class="w">
+</span><span class="m">5</span><span class="w">
+</span></code></pre></div></div>
+
+<p>You can do operations on vectors by doing mathematical operations on the whole vector like that:</p>
+<div class="language-R highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">biggerNumbericVector</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">numericVector</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="m">5</span><span class="w">
+</span><span class="n">numericVector</span><span class="w">
+</span><span class="n">biggerNumbericVector</span><span class="w">
+</span></code></pre></div></div>
+<p>Output:</p>
+<div class="language-R highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="m">1</span><span class="w">
+</span><span class="m">2</span><span class="w">
+</span><span class="m">3</span><span class="w">
+</span><span class="m">4</span><span class="w">
+</span><span class="m">5</span><span class="w">
+
+</span><span class="m">6</span><span class="w">
+</span><span class="m">7</span><span class="w">
+</span><span class="m">8</span><span class="w">
+</span><span class="m">9</span><span class="w">
+</span></code></pre></div></div>
+<p>you can also do such operations on string vectors like that:</p>
+<div class="language-R highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">helloStringVector</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">paste</span><span class="p">(</span><span class="s1">'Hello '</span><span class="p">,</span><span class="w"> </span><span class="n">stringVector</span><span class="p">)</span><span class="w">
+</span><span class="n">helloStringVector</span><span class="w">
+</span></code></pre></div></div>
+<p>Output:</p>
+<div class="language-R highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="s1">'Hello  lucas'</span><span class="w">
+</span><span class="s1">'Hello marie'</span><span class="w">
+</span><span class="s1">'Hello laura'</span><span class="w">
+</span></code></pre></div></div>
+
+<p>Always have in mind, which datatype you are dealing with. Numeric operations only work
+on numeric vectors, try and see what happens when you try that on strings:</p>
+
+<div class="language-R highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">biggerStringVector</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">stringVector</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="m">5</span><span class="w">
+
+</span></code></pre></div></div>
+
+<h4 id="42-dataframes">4.2 Dataframes</h4>
+
+<p>Dataframes are also very important data structures. They are 2-dimensional and built like a table.
+They have rows and columns, column-headers and row-indices. Lets first look at a simple example on how to 
+define them and what they look like:</p>
+<div class="language-R highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">df</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">data.frame</span><span class="p">(</span><span class="w">
+    </span><span class="s2">"name"</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nf">c</span><span class="p">(</span><span class="s2">"Marie"</span><span class="p">,</span><span class="w"> </span><span class="s2">"Lukas"</span><span class="p">,</span><span class="w"> </span><span class="s2">"Laura"</span><span class="p">,</span><span class="w"> </span><span class="s2">"Jenny"</span><span class="p">),</span><span class="w"> 
+    </span><span class="s2">"height"</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nf">c</span><span class="p">(</span><span class="m">1.81</span><span class="p">,</span><span class="w"> </span><span class="m">1.75</span><span class="p">,</span><span class="w"> </span><span class="m">1.68</span><span class="p">,</span><span class="w"> </span><span class="m">1.71</span><span class="p">),</span><span class="w"> 
+    </span><span class="s2">"age"</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nf">c</span><span class="p">(</span><span class="m">19</span><span class="p">,</span><span class="m">18</span><span class="p">,</span><span class="m">21</span><span class="p">,</span><span class="m">17</span><span class="p">)</span><span class="w">
+</span><span class="p">)</span><span class="w">
+</span></code></pre></div></div>
+<p>Here we built a very simple resemblence of some measurements over a day. We call our dataframe “df” and initialize
+the dataframe by calling the function data.frame(). You can have a look at the documentation using the help() function.
+In the dataframe definition we can define our columns as strings and then pass values to these columns. Within one dataframe
+it is very important that the columns have the same number of values, otherwise you will encounter an error.
+You can show the dataframe by calling it and have a look at how nicely formatted the table alraedy is now:</p>
+<div class="language-R highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">df</span><span class="w">
+</span></code></pre></div></div>
+<table>
+<thead><tr><th scope="col">name</th><th scope="col">height</th><th scope="col">age</th></tr></thead>
+<tbody>
+	<tr><td>Marie</td><td>1.81 </td><td>19   </td></tr>
+	<tr><td>Lukas</td><td>1.75 </td><td>18   </td></tr>
+	<tr><td>Laura</td><td>1.68 </td><td>21   </td></tr>
+	<tr><td>Jenny</td><td>1.71 </td><td>17   </td></tr>
+</tbody>
+</table>
+
+<p>If you want to find out how many rows or columns your dataframes has  there are nice functions to do that, nrow and ncol
+which just stands for “number of rows” and “number of columns”</p>
+<div class="language-R highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">nrow</span><span class="p">(</span><span class="n">df</span><span class="p">)</span><span class="w">
+</span><span class="n">ncol</span><span class="p">(</span><span class="n">df</span><span class="p">)</span><span class="w">
+</span></code></pre></div></div>
+<p>Ouput:</p>
+<div class="language-R highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="m">4</span><span class="w">
+</span><span class="m">3</span><span class="w">
+</span></code></pre></div></div>
+
+<p>The data frame gives you some great ways to access the data. Because it is a 2-dimensional construct you can get values
+with 2-dimensional indices in square brackets, defining first the row and second the column index:</p>
+<div class="language-R highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">df</span><span class="p">[</span><span class="m">3</span><span class="p">,</span><span class="m">1</span><span class="p">]</span><span class="w"> </span><span class="c1"># row 3, column 1</span><span class="w">
+</span><span class="n">df</span><span class="p">[</span><span class="m">2</span><span class="p">,</span><span class="m">3</span><span class="p">]</span><span class="c1"># row 2, column 3</span><span class="w">
+</span></code></pre></div></div>
+<p>Ouput:</p>
+<div class="language-R highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">Laura</span><span class="w">
+</span><span class="m">18</span><span class="w">
+</span></code></pre></div></div>
+<p>You can also just like before get consecutive values using the “:”</p>
+<div class="language-R highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">df</span><span class="p">[</span><span class="m">2</span><span class="o">:</span><span class="m">3</span><span class="p">,</span><span class="m">2</span><span class="p">]</span><span class="w"> </span><span class="c1"># row 2 to 3, column 2</span><span class="w">
+</span></code></pre></div></div>
+<p>Ouput:</p>
+<div class="language-R highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="m">1.75</span><span class="w">
+</span><span class="m">1.68</span><span class="w">
+</span></code></pre></div></div>
+
+<p>another very convenient way to access data in a dataframe is by using the column names and the symbol “$”:</p>
+<div class="language-R highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">df</span><span class="o">$</span><span class="n">age</span><span class="w">
+</span><span class="n">df</span><span class="o">$</span><span class="n">height</span><span class="w">
+</span></code></pre></div></div>
+<p>Ouput:</p>
+<div class="language-R highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="m">19</span><span class="w">
+</span><span class="m">18</span><span class="w">
+</span><span class="m">21</span><span class="w">
+</span><span class="m">17</span><span class="w">
+
+</span><span class="m">1.81</span><span class="w">
+</span><span class="m">1.75</span><span class="w">
+</span><span class="m">1.68</span><span class="w">
+</span><span class="m">1.71</span><span class="w"> 
+</span></code></pre></div></div>
+
+<p>If you use this way, you can access specific rows by passing in a row index with square brackets:</p>
+<div class="language-R highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">df</span><span class="o">$</span><span class="n">age</span><span class="p">[</span><span class="m">1</span><span class="p">]</span><span class="w">
+</span><span class="n">df</span><span class="o">$</span><span class="n">height</span><span class="p">[</span><span class="m">2</span><span class="p">]</span><span class="w">
+</span></code></pre></div></div>
+<p>Ouput:</p>
+<div class="language-R highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="m">19</span><span class="w">
+</span><span class="m">1.75</span><span class="w">
+</span></code></pre></div></div>
+
+<p>Another very important concept is getting data by conditions
+For example you might want to know, which of the persons in the dataframe are older than 20. You can find out like this:</p>
+<div class="language-R highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">df</span><span class="p">[</span><span class="n">df</span><span class="o">$</span><span class="n">age</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="m">20</span><span class="p">,]</span><span class="w">
+</span></code></pre></div></div>
+<p>Ouput:</p>
+<div class="language-R highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="w"> 	</span><span class="n">name</span><span class="w">	</span><span class="n">height</span><span class="w">	</span><span class="n">age</span><span class="w">
+</span><span class="m">3</span><span class="w">	</span><span class="n">Laura</span><span class="w">	</span><span class="m">1.68</span><span class="w"> 	</span><span class="m">21</span><span class="w"> 
+</span></code></pre></div></div>
+
+<p>Look exactly at what is happening here. For the row-indices we look for the condition, where the column df$age is greater than 20. Here you can see the output of that condition:</p>
+<div class="language-R highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">df</span><span class="o">$</span><span class="n">age</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="m">20</span><span class="w">
+</span><span class="kc">FALSE</span><span class="w">
+</span><span class="kc">FALSE</span><span class="w">
+</span><span class="kc">TRUE</span><span class="w">
+</span><span class="kc">FALSE</span><span class="w">
+</span></code></pre></div></div>
+<p>Then there is just a comma and the column index is left out. That just means that we want to have all the
+columns. If we don’t care about the height, we could also just ouput the name:</p>
+<div class="language-R highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">df</span><span class="p">[</span><span class="n">df</span><span class="o">$</span><span class="n">age</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="m">20</span><span class="p">,</span><span class="m">1</span><span class="p">]</span><span class="w"> </span><span class="c1"># &lt;-- 1 as column index specifies that we only want the name</span><span class="w">
+</span><span class="n">Laura</span><span class="w">
+</span></code></pre></div></div>
+<p>Play around with that dataframe for a bit to get familiar. E.g. find which of these persons are allowed on the 
+rollercoaster (only people taller than 1.70 are allowed in ;) )</p>
+
+<p>I will give you two more very convenient functions to access specific parts of the data: head() and tail()
+You don’t have to remember them know but it might be good to have heard about it.
+you can use head() to access the first rows of a dataframe and tail() to access the last rows. As a second argument
+you can pass in the number of rows you want to access:</p>
+<div class="language-R highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">head</span><span class="p">(</span><span class="n">df</span><span class="p">,</span><span class="m">2</span><span class="p">)</span><span class="w">
+</span><span class="n">tail</span><span class="p">(</span><span class="n">df</span><span class="p">,</span><span class="m">1</span><span class="p">)</span><span class="w">
+</span></code></pre></div></div>
+<table>
+<thead><tr><th scope="col">name</th><th scope="col">height</th><th scope="col">age</th></tr></thead>
+<tbody>
+	<tr><td>Marie</td><td>1.81 </td><td>19   </td></tr>
+	<tr><td>Lukas</td><td>1.75 </td><td>18   </td></tr>
+</tbody>
+</table>
+
+<table>
+<thead><tr><th></th><th scope="col">name</th><th scope="col">height</th><th scope="col">age</th></tr></thead>
+<tbody>
+	<tr><th scope="row">4</th><td>Jenny</td><td>1.71 </td><td>17   </td></tr>
+</tbody>
+</table>
+
+<hr />
+<h3 id="exercise-4">Exercise:</h3>
+
+<ol>
+  <li>create your own data frame for measurements of meteorological variables over one day from the following data:
+( try to do it yourself, but if you have issues getting it done, the dataframe is defined 4 cells below this)
+    <div class="language-R highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">temperatureMeasurements</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nf">c</span><span class="p">(</span><span class="m">3</span><span class="p">,</span><span class="m">3</span><span class="p">,</span><span class="m">4</span><span class="p">,</span><span class="m">4</span><span class="p">,</span><span class="m">6</span><span class="p">,</span><span class="m">7</span><span class="p">,</span><span class="m">8</span><span class="p">,</span><span class="m">10</span><span class="p">,</span><span class="m">11</span><span class="p">,</span><span class="m">12</span><span class="p">,</span><span class="w"> </span><span class="m">13</span><span class="p">,</span><span class="m">15</span><span class="p">,</span><span class="m">15</span><span class="p">,</span><span class="m">16</span><span class="p">,</span><span class="m">16</span><span class="p">,</span><span class="m">17</span><span class="p">,</span><span class="m">16</span><span class="p">,</span><span class="m">15</span><span class="p">,</span><span class="m">15</span><span class="p">,</span><span class="m">13</span><span class="p">,</span><span class="m">11</span><span class="p">,</span><span class="m">10</span><span class="p">,</span><span class="m">7</span><span class="p">,</span><span class="m">4</span><span class="p">)</span><span class="w">
+</span><span class="n">rainMeasurements</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nf">c</span><span class="p">(</span><span class="m">0</span><span class="p">,</span><span class="m">0</span><span class="p">,</span><span class="m">0</span><span class="p">,</span><span class="m">0</span><span class="p">,</span><span class="m">0</span><span class="p">,</span><span class="m">0</span><span class="p">,</span><span class="m">0</span><span class="p">,</span><span class="m">0</span><span class="p">,</span><span class="m">0</span><span class="p">,</span><span class="m">0</span><span class="p">,</span><span class="m">0</span><span class="p">,</span><span class="m">0</span><span class="p">,</span><span class="m">3</span><span class="p">,</span><span class="m">5</span><span class="p">,</span><span class="m">2</span><span class="p">,</span><span class="m">0</span><span class="p">,</span><span class="m">0</span><span class="p">,</span><span class="m">0</span><span class="p">,</span><span class="m">0</span><span class="p">,</span><span class="m">0</span><span class="p">,</span><span class="m">0</span><span class="p">,</span><span class="m">0</span><span class="p">,</span><span class="m">0</span><span class="p">,</span><span class="m">0</span><span class="p">)</span><span class="w">
+</span><span class="n">time</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nf">c</span><span class="p">(</span><span class="m">1</span><span class="o">:</span><span class="m">24</span><span class="p">)</span><span class="w">
+</span></code></pre></div>    </div>
+  </li>
+  <li>There are more convenience functions in R alraedy implemented, that make your life a lot easier. For example 
+the mean() function and the sum() function you already now.
+Using the indexing methods you learnt above, compute the mean temperature 
+and the the sum of the rainfall for this timeseries</li>
+</ol>
+
+<hr />
+<h3 id="5-visualizing-data">5. Visualizing Data</h3>
+
+<p>Now we have our data structures but one of the most important things you can do with data is to visualize it.
+We will just dip our toe into data visualization in R, just to get you familiar with the concept.</p>
+
+<p>in order to create a nice plot we will have to use an external library. In this case we will use ggplot
+it is the most sophisticated package for data visualization and it is good to start with that right away.
+Since we might not have ggplot on our pc we would have to install it first. R makes that very easy for us and
+we can do it right from the script:</p>
+<div class="language-R highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">install.packages</span><span class="p">(</span><span class="s2">"ggplot2"</span><span class="p">)</span><span class="w">
+</span></code></pre></div></div>
+
+<p>Now that we have the package on our pc we can load it into our script like this:</p>
+<div class="language-R highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">library</span><span class="p">(</span><span class="n">ggplot2</span><span class="p">)</span><span class="w">
+</span></code></pre></div></div>
+
+<p>Next we create a little dataframe to visualize data from using the data used in the exercise before:</p>
+<div class="language-R highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">temperatureMeasurements</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nf">c</span><span class="p">(</span><span class="m">3</span><span class="p">,</span><span class="m">3</span><span class="p">,</span><span class="m">4</span><span class="p">,</span><span class="m">4</span><span class="p">,</span><span class="m">6</span><span class="p">,</span><span class="m">7</span><span class="p">,</span><span class="m">8</span><span class="p">,</span><span class="m">10</span><span class="p">,</span><span class="m">11</span><span class="p">,</span><span class="m">12</span><span class="p">,</span><span class="w"> </span><span class="m">13</span><span class="p">,</span><span class="m">15</span><span class="p">,</span><span class="m">15</span><span class="p">,</span><span class="m">16</span><span class="p">,</span><span class="m">16</span><span class="p">,</span><span class="m">17</span><span class="p">,</span><span class="m">16</span><span class="p">,</span><span class="m">15</span><span class="p">,</span><span class="m">15</span><span class="p">,</span><span class="m">13</span><span class="p">,</span><span class="m">11</span><span class="p">,</span><span class="m">10</span><span class="p">,</span><span class="m">7</span><span class="p">,</span><span class="m">4</span><span class="p">)</span><span class="w">
+</span><span class="n">rainMeasurements</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nf">c</span><span class="p">(</span><span class="m">0</span><span class="p">,</span><span class="m">0</span><span class="p">,</span><span class="m">0</span><span class="p">,</span><span class="m">0</span><span class="p">,</span><span class="m">0</span><span class="p">,</span><span class="m">0</span><span class="p">,</span><span class="m">0</span><span class="p">,</span><span class="m">0</span><span class="p">,</span><span class="m">0</span><span class="p">,</span><span class="m">0</span><span class="p">,</span><span class="m">0</span><span class="p">,</span><span class="m">0</span><span class="p">,</span><span class="m">3</span><span class="p">,</span><span class="m">5</span><span class="p">,</span><span class="m">2</span><span class="p">,</span><span class="m">0</span><span class="p">,</span><span class="m">0</span><span class="p">,</span><span class="m">0</span><span class="p">,</span><span class="m">0</span><span class="p">,</span><span class="m">0</span><span class="p">,</span><span class="m">0</span><span class="p">,</span><span class="m">0</span><span class="p">,</span><span class="m">0</span><span class="p">,</span><span class="m">0</span><span class="p">)</span><span class="w">
+</span><span class="n">time</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nf">c</span><span class="p">(</span><span class="m">1</span><span class="o">:</span><span class="m">24</span><span class="p">)</span><span class="w">
+
+</span><span class="n">dfMet</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">data.frame</span><span class="p">(</span><span class="w">
+    </span><span class="s2">"hour"</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">time</span><span class="p">,</span><span class="w"> 
+    </span><span class="s2">"temp_C"</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">temperatureMeasurements</span><span class="p">,</span><span class="w"> 
+    </span><span class="s2">"rain_mm"</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">rainMeasurements</span><span class="w">
+</span><span class="p">)</span><span class="w">
+</span></code></pre></div></div>
+<p>The way we define figures in ggplot is that we call the ggplot function and pass a complete dataframe into it.
+as a second argument we need the aes() function (“aesthetic mapping”) to which we can give the names of the columns
+that we want to plot. That makes it very easy to access data in our plotting function. aes() will understand
+that you want to access these columns, because you have connected the dataframe to the figure.</p>
+<div class="language-R highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">figure</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ggplot</span><span class="p">(</span><span class="n">dfMet</span><span class="p">,</span><span class="w"> </span><span class="n">aes</span><span class="p">(</span><span class="n">hour</span><span class="p">,</span><span class="w"> </span><span class="n">temp_C</span><span class="p">))</span><span class="w">
+</span></code></pre></div></div>
+<p>We now have a figure object, which contains the data we want to plot. But we still need to define, what type of 
+plot it should be.
+We define the type of plot we want to create by adding a specific function from the ggplot library to our figure,
+e.g. geom_point() for a scatter plot, geom_line for a line plot or geom_histogram for a histogram</p>
+<div class="language-R highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">figure</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">geom_point</span><span class="p">()</span><span class="w">
+
+</span></code></pre></div></div>
+
+<p><img src="output_35_0.png" alt="png" /></p>
+
+<p>You can further customize your figure with all sorts of things, e.g. give it new labels on the axes or define 
+a new color for your dots. All this is done by adding specific functions from the library to your figure or by passing
+additional arguments to your functions:</p>
+<div class="language-R highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">figure2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ggplot</span><span class="p">(</span><span class="n">dfMet</span><span class="p">,</span><span class="w"> </span><span class="n">aes</span><span class="p">(</span><span class="n">hour</span><span class="p">,</span><span class="w"> </span><span class="n">temp_C</span><span class="p">))</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">geom_point</span><span class="p">(</span><span class="n">shape</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">21</span><span class="p">,</span><span class="w"> </span><span class="n">fill</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"blue"</span><span class="p">)</span><span class="w">
+</span><span class="n">figure2</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">labs</span><span class="p">(</span><span class="n">title</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"Temperature over one day"</span><span class="p">,</span><span class="w"> </span><span class="n">x</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"Hour"</span><span class="p">,</span><span class="w"> </span><span class="n">y</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"Temperature [°C]"</span><span class="p">)</span><span class="w">
+</span></code></pre></div></div>
+
+<hr />
+<h3 id="exercise-5">Exercise:</h3>
+<p>You can go ahead and try to change the plot below into a line plot and into a dashed line.
+As an extra, try to figure out how to plot the data with both points and a line in the same graph</p>
+
+<p>We will leave it with this for now, but if you want to explore data visualization with ggplot a bit more
+you can find a good documentation of the library here: https://ggplot2.tidyverse.org/reference/</p>
+
+<hr />
+<h3 id="6-extra-loops-and-conditionals">6. Extra: Loops and conditionals</h3>
+
+<p>NOTICE: This part is pretty essential for programming, but not for this exercise. You can look at it if you
+are interested and have the time, but you will be fine if you skip it for now.</p>
+
+<p>You already have quite a nice toolbox by now. There are two last concepts that we need to look at because they
+are fundamental for writing scripts, loops and conditionals. Even though they are quite essential, we will not look
+at them in great depth because you will probably not need them for your task. I will show the concept and if you 
+are interested you can do some further exploration yourself
+Loops allow you to easily do operations with a large number
+of values while conditions define specific circumstances, under which an operation should be done.
+Here we will just look at two specific strcutures: the for-loop and the if-condition.</p>
+
+<h4 id="61-the-for-loop">6.1 The For-loop</h4>
+<p>The for-loop is a very useful loop. It repeatedly executes some operation for as many times as you tell it to.
+lets look at a little example:</p>
+<div class="language-R highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="n">i</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="m">1</span><span class="o">:</span><span class="m">5</span><span class="p">){</span><span class="w">
+    </span><span class="n">print</span><span class="p">(</span><span class="n">i</span><span class="p">)</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre></div></div>
+<p>You start the loop  definition with the keyword for followed by the definition of how often the procedure should be
+executed. R makes that very easy for you, you can just put any list/vector of values in there. For each iteration
+that the loop runs, the current item in the list will be stored in the variable that stands before the “in”.
+For example in the above loop the first time the loop runs i is 1, the second time i is 2 and so on. You can name
+that variable however you want:</p>
+<div class="language-R highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="n">name</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="nf">c</span><span class="p">(</span><span class="s2">"Marie"</span><span class="p">,</span><span class="w"> </span><span class="s2">"Lukas"</span><span class="p">,</span><span class="w"> </span><span class="s2">"Laura"</span><span class="p">)){</span><span class="w">
+    </span><span class="n">print</span><span class="p">(</span><span class="n">name</span><span class="p">)</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre></div></div>
+
+<hr />
+<h3 id="exercise-6">Exercise:</h3>
+
+<p>you already have quite some tools now. Use them by writing a function that sums up all the items in a list and
+returns the sum.
+Hint: In the function define a variable that is 0. Then you can loop over your input list and add the numbers from the
+list.</p>
+
+<hr />
+
+<h4 id="62-the-if-condition">6.2 The if-condition</h4>
+
+<p>The if condition does pretty much exactly what you would expect it to do. It executes the codeblock in its 
+body IF a certain condition is true. Here is a very easy example:</p>
+<div class="language-R highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">x</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">10</span><span class="w">
+</span><span class="k">if</span><span class="p">(</span><span class="n">x</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="m">10</span><span class="p">){</span><span class="w">
+    </span><span class="n">print</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre></div></div>
+<p>You see the structure is just like we had it for the for-loop. The keyword “if” followed by the condition that defines
+whether the codeblock runs in brackets and finally the body of the function in curly braces.</p>
+
+<p>You can use all kinds of conditions in your if-conditions:</p>
+<div class="language-R highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">x</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">11</span><span class="w">
+</span><span class="k">if</span><span class="p">(</span><span class="n">x</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="m">10</span><span class="p">){</span><span class="w">
+    </span><span class="n">print</span><span class="p">(</span><span class="s2">"11 is not equal 10"</span><span class="p">)</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span><span class="k">if</span><span class="p">(</span><span class="n">x</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="m">10</span><span class="p">){</span><span class="w">
+    </span><span class="n">print</span><span class="p">(</span><span class="s2">"11 is bigger than 10"</span><span class="p">)</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span><span class="k">if</span><span class="p">(</span><span class="n">x</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="m">12</span><span class="p">){</span><span class="w">
+    </span><span class="n">print</span><span class="p">(</span><span class="s2">"11 is smaller than 12"</span><span class="p">)</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span><span class="k">if</span><span class="p">(</span><span class="n">x</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="m">12</span><span class="w"> </span><span class="o">&amp;</span><span class="w"> </span><span class="n">x</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="s2">"herbert"</span><span class="p">){</span><span class="w">
+    </span><span class="n">print</span><span class="p">(</span><span class="s2">"11 is smaller than 12 AND not equal to herbert"</span><span class="p">)</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre></div></div>
+
+<div class="language-R highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># These two statements don't result in an output because the conditions are false.</span><span class="w">
+</span><span class="k">if</span><span class="p">(</span><span class="n">x</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="m">10</span><span class="p">){</span><span class="w">
+    </span><span class="n">print</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span><span class="k">if</span><span class="p">(</span><span class="n">x</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="m">10</span><span class="p">){</span><span class="w">
+    </span><span class="n">print</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="w">
+</span><span class="p">}</span><span class="w">
+
+</span></code></pre></div></div>
+<p>A very common application is the combination of the if-condition and a for-loop such as</p>
+<div class="language-R highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">for</span><span class="p">(</span><span class="w"> </span><span class="n">row</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="n">nrow</span><span class="p">(</span><span class="n">df</span><span class="p">)){</span><span class="w">
+    </span><span class="n">age</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">df</span><span class="p">[</span><span class="n">row</span><span class="p">,</span><span class="m">3</span><span class="p">]</span><span class="w">
+    </span><span class="k">if</span><span class="p">(</span><span class="n">age</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="m">15</span><span class="p">){</span><span class="w">
+        </span><span class="n">print</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="n">row</span><span class="p">,</span><span class="m">1</span><span class="p">])</span><span class="w">
+    </span><span class="p">}</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre></div></div>
+<p>To be fair, in this case it is just a more complicated way of finding what we already did better by using filtering 
+in section 4 but it shows the concept. Usually there are ways to do things like this with filtering and if you 
+can find a way it is usually the better way to go.</p>
+
+<p>Hurray, you have made it this far and are on the best way to become an R mastermind! 
+So if you are ready you can dive into the exercise and work on some real meteorological data!</p>
+
+        
+      </section>
+
+      <footer class="page__meta">
+        
+        
+
+
+        
+
+      </footer>
+
+      
+
+      
+    </div>
+
+    
+  </article>
+
+  
+  
+</div>
+
+    </div>
+
+    
+      <div class="search-content">
+        <div class="search-content__inner-wrap"><form class="search-content__form" onkeydown="return event.key != 'Enter';" role="search">
+    <label class="sr-only" for="search">
+      Enter your search term...
+    </label>
+    <input type="search" id="search" class="search-input" tabindex="-1" placeholder="Enter your search term..." />
+  </form>
+  <div id="results" class="results"></div></div>
+
+      </div>
+    
+
+    <div id="footer" class="page__footer">
+      <footer>
+        <!-- start custom footer snippets -->
+
+<!-- end custom footer snippets -->
+        <div class="page__footer-follow">
+  <ul class="social-icons">
+    
+
+    
+      
+        
+          <li><a href="https://twitter.com/" rel="nofollow noopener noreferrer"><i class="fab fa-fw fa-twitter-square" aria-hidden="true"></i> Twitter</a></li>
+        
+      
+        
+          <li><a href="https://github.com/" rel="nofollow noopener noreferrer"><i class="fab fa-fw fa-github" aria-hidden="true"></i> GitHub</a></li>
+        
+      
+        
+          <li><a href="https://instagram.com/" rel="nofollow noopener noreferrer"><i class="fab fa-fw fa-instagram" aria-hidden="true"></i> Instagram</a></li>
+        
+      
+    
+
+    
+      <li><a href="/feed.xml"><i class="fas fa-fw fa-rss-square" aria-hidden="true"></i> Feed</a></li>
+    
+  </ul>
+</div>
+
+<div class="page__footer-copyright">&copy; 2023 Data Analysis for Ecologists. Powered by <a href="https://jekyllrb.com" rel="nofollow">Jekyll</a> &amp; <a href="https://mademistakes.com/work/minimal-mistakes-jekyll-theme/" rel="nofollow">Minimal Mistakes</a>.</div>
+
+      </footer>
+    </div>
+
+    
+  <script src="/assets/js/main.min.js"></script>
+
+
+
+
+<script src="/assets/js/lunr/lunr.min.js"></script>
+<script src="/assets/js/lunr/lunr-store.js"></script>
+<script src="/assets/js/lunr/lunr-en.js"></script>
+
+
+
+
+
+
+
+  </body>
+</html>
