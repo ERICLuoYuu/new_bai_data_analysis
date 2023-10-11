@@ -17,11 +17,13 @@ r:
     url: "/4_r_extreme_detection/"
 
 python:
-  - title: "Basics of Python"
-    url: /_pages/python_course/1_python_basics/
-  - title: "Data Visualization"
-    url: /_pages/python_course/2_data_viz/
-  - title: "Interpolation and Gap Filling"
-    url: /_pages/python_course/3_interp_gapfil/
-  - title: "Extreme Value Detection"
-    url: "/4_extreme_detection/"
+  - title: "0. Installation"
+    url: python_0_installation
+  - title: "1. Basics of Python"
+    url: python_1_basics
+  - title: "2. Data Visualization"
+    url: python_2_data_viz
+  - title: "3. Interpolation and Gap Filling"
+    url: python_3_interp_gapfill
+  - title: "4. Extreme Value Detection"
+    url: python_4_extremes

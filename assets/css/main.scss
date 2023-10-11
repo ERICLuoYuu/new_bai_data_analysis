@@ -1,0 +1,11 @@
+---
+---
+
+@import "{{ site.theme }}";
+.page__content {
+  p,
+  li,
+  dl {
+    font-size: 0.75em;
+  }
+}

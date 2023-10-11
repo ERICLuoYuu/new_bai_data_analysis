@@ -53,7 +53,13 @@
 <loc>http://localhost:4000/0_r_landing_page</loc>
 </url>
 <url>
+<loc>http://localhost:4000/python_0_installation</loc>
+</url>
+<url>
 <loc>http://localhost:4000/python_0_landing_page</loc>
+</url>
+<url>
+<loc>http://localhost:4000/python_1_basics</loc>
 </url>
 <url>
 <loc>http://localhost:4000/tags/</loc>
