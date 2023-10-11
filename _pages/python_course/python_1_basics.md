@@ -23,13 +23,57 @@ can always come back and find help in here, in the internet or from me directly.
   
 Here are some useful ressources if you get stuck:
 
-[Link: A general tutorial on several topics](https://www.tutorialkart.com/r-tutorial/)
+[Link: Tutorials on many topics where you can quickly look up things...](https://www.w3schools.com/python/python_intro.asp)
+[Link: Another nice overview of many functionalities of Python (requires login)...](https://www.w3schhttps://www.geeksforgeeks.org/python-cheat-sheet/)
+Geeksforgeeks requires you to make an account or use e.g. a google login, but it features many tutorials, project ideas, quizzes and so on on many programming languages and general
+topics such as Machine Learning, Data Visualization, Data Science, Web Development and many more
+[Link: Later on we will use the library "Pandas" (so cute!) for data handling. A nice cheat sheet is provided by the developers...](https://pandas.pydata.org/Pandas_Cheat_Sheet.pdf)
 
-[Link: A comprehensive list of built-in functions](https://www.javatpoint.com/r-built-in-functions)
 
-and last but not least, if you need help with a specific function (we will talk about functions later), you can 
-use the nice inbuilt method help(). For example you can run help(paste) and will directly see the documentation
-for that function
-
-## 1. General stuff about Python
+## 1. General things about Python
 I quickly want to highlight some things which are special about Python compared to many other programming languages and that one needs to get used to.  
+
+### Python is indentation sensitive
+In Python it matters, how far you indent your lines, meaning how much space you have at the beginning of a line.
+As an example this will work:
+```python
+a = 5
+b = 1
+```
+but this will throw an error:
+```python
+a = 5
+  b = 5
+```
+will result in an error:
+```python
+File "<stdin>", line 1
+  b = 5
+IndentationError: unexpected indent
+```
+
+### Variables
+Generally in Python variables are created by assigning a value to them with an equal sign, just like we did above. Theire output can be shown by just typing the variable:
+```python
+a = 5
+a
+5
+``` 
+
+### Comments
+Comments are lines in the code that are not executed and are there for documentation. For now it is a good idea to use comments in your code to keep track of what is happening where.  
+Single line comments are always created with an '#'. Everything after that symbol in the line is not executed. Multi-line comments can be written by enclosing them in three ':
+```python
+# first I create a single line comment, this is not executed
+a = 5 # this line is executed, but the comment gets ignored
+''' 
+Now I write a multi-line comment
+I can continue the comment on the next line
+b = 5 <-- this is ignored
+'''
+
+```
+
+
+## 2. Data Types and Variables
+As in all programming languages, there are different types of data in Python. 
