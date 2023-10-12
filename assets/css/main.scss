@@ -2,6 +2,12 @@
 ---
 
 @import "{{ site.theme }}";
+@media (min-width: 80em) {
+  .page {
+    width: calc(100% - 300px);
+    padding-right: 150px;
+  }
+}
 .page__content {
   p,
   li,
