@@ -257,7 +257,7 @@ h = 12 % 5  # Modulus, this returns the remaining amount after fitting one numbe
 ```
 {% capture exercise %}
 <h3> Exercise </h3>
-<p style="font-size:18px;">With what you know so far, grab the scores josefine scored in the last games and compute the average amount of goals per game she scores</p>
+<p >With what you know so far, grab the scores josefine scored in the last games and compute the average amount of goals per game she scores</p>
 
 {::options parse_block_html="true" /}
 
@@ -268,7 +268,7 @@ scores = josefine["scores_last_games"]
 total_scores = scores[0] + scores[1] + scores[2] + scores[3]
 mean_scores = total_scores / 4
 ```
-<p style="font-size:18px;">There are much better solutions to this, for example the iteration over all scores can be done with the built-in function sum()
+<p >There are much better solutions to this, for example the iteration over all scores can be done with the built-in function sum()
 and the total number of score-values can be found using the len() function. A one-line solution could look like this:</p>
 
 ```python
@@ -349,7 +349,7 @@ a in c
 {% capture exercise %}
 
 <h3> Exercise </h3>
-<p style="font-size:18px;">Now you know all about operators. Try to use your knowledge and figure out what we test for in the following operations and what the result is:</p>
+<p >Now you know all about operators. Try to use your knowledge and figure out what we test for in the following operations and what the result is:</p>
 
 {::options parse_block_html="true" /}
 
@@ -502,7 +502,7 @@ It will print the numbers 1 to 10, including 10
 {% capture warning %}
 
 <h3> Warning </h3>
-<p style="font-size:18px;">When you define a while-loop, always make sure that the condition will at some
+<p >When you define a while-loop, always make sure that the condition will at some
 point be fullfilled. Otherwise it can easily happen that youre while-loop just keeps running
 endlessly!</p>
 
@@ -528,13 +528,13 @@ while a <= 10:
 {% capture exercise %}
 
 <h3> Exercise </h3>
-<p style="font-size:18px;">Now you already know quite some tools for writing a Python script! Use your knowledge to complete the code below.
+<p >Now you already know quite some tools for writing a Python script! Use your knowledge to complete the code below.
 The goal is to print the doy (day of the year, as in 1-365) and the sentence "{month} was a hot month" whenever the mean monthly temperature is above two times the mean
 and "{month} was a dry month" whenever the precipitation was less than half of the mean.  </p>
-<p style="font-size:18px;">One tip: For the printing you can use formatted strings. They make inserting variables in a string much easier! 
+<p >One tip: For the printing you can use formatted strings. They make inserting variables in a string much easier! 
 just put an "f" in front of the string and insert the variable in curly braces {}.  
 For example print(f"Hello {name}" would print "Hello Peter" if the variable name=Peter is defined.</p>
-<p style="font-size:18px;">Here is your starter code:</p>
+<p >Here is your starter code:</p>
 
 
 {::options parse_block_html="true" /}
@@ -647,7 +647,7 @@ def calculate_mean(list_of_values:list[float]) -> int:
 {% capture exercise %}
 
 <h3> Exercise 5.1.1 </h3>
-<p style="font-size:18px;">As a first exercise, try to figure out what the output of the below
+<p >As a first exercise, try to figure out what the output of the below
 function will be without executing it!</p>
 
 {::options parse_block_html="true" /}
@@ -668,7 +668,7 @@ print(d)
 
 
 <details><summary markdown="span">Solution!</summary>
-<p style="font-size:18px;">The result is 4!</p>
+<p >The result is 4!</p>
 
 ```python
 def square_value(value:int) -> int:
@@ -698,15 +698,15 @@ print(d)                                # so 4/2 is 2, thn 2*2 is 4
 {% capture exercise %}
 
 <h3> Exercise 5.1.2 </h3>
-<p style="font-size:18px;">Lets go for a bit more challenging of an exericse (I am sure you are ready for it!)
+<p >Lets go for a bit more challenging of an exericse (I am sure you are ready for it!)
 There is a built-in function that allows the user to give an input through the command-line to the program.
 It is simply called "input()". E.g. "testword = input()" would stop the program and wait for the user to input
 something in the console and then press enter. </p>
-<p  style="font-size:18px;">Imagine you want a program in which you set a new password.
+<p  >Imagine you want a program in which you set a new password.
 Write a function that checks whether the new password is longer than 9 symbols and that returns the corresponding
 boolean. the function should also print that the password is too short if it is too short and that it is ok when it is ok. 
 Use the returned boolean to keep asking for new input from the user <u>while</u> the word is less than 9 characters long</p>
-<p  style="font-size:18px;">Here is some starter code:</p>
+<p  >Here is some starter code:</p>
 
 {::options parse_block_html="true" /}
 
@@ -833,17 +833,17 @@ amtsvenn.print_ecosystem_information()
 {% capture exercise %}
 
 <h3> Exercise 5.2.1 </h3>
-<p style="font-size:18px;">Lets do one exercise that can further show, why classes are great for creating reusable code. 
+<p >Lets do one exercise that can further show, why classes are great for creating reusable code. 
 Try to write a function called "Statistics". This class will be a "behavioural" class, meaning it does not need to hold
 own data but rather holds some methods, that belong to the same topic. In that class, define functions that calculate the 
 mean, the variance and the standard deviation of a given list. Then use that class to calculate these metrics of an arbitrary list. </p>
-<p style="font-size:18px;"> Hint: For the standard deviation you need to take the square root. You can do that with pythons built-in math module.
+<p > Hint: For the standard deviation you need to take the square root. You can do that with pythons built-in math module.
 You can use it like this: </p>
 ```python
 import math
 math.sqrt(24)
 ```
-<p style="font-size:18px;">Try to work out the solution yourself first! There is some starter code below, in case you get stuck though.</p>
+<p >Try to work out the solution yourself first! There is some starter code below, in case you get stuck though.</p>
 
 {::options parse_block_html="true" /}
 
