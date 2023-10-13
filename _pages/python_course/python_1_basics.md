@@ -1,6 +1,7 @@
 ---
 title: "Introduction"
 permalink: python_1_basics
+author_profile: false
 sidebar:
   nav: "python"
 ---
@@ -399,7 +400,7 @@ f = (alfonso["grade_ecophysiology"] > 4.0 or alfonso["grade_archery"] > 4.0) or 
 
 {% endcapture %}
 
-<div class="notice--warning">
+<div class="notice--primary">
   {{ exercise | markdownify }}
 </div>
 
@@ -905,7 +906,7 @@ variance = stat.calculate_variance(example_list)
 
 {% endcapture %}
 
-<div class="notice--warning">
+<div class="notice--primary">
   {{ exercise | markdownify }}
 </div>
 

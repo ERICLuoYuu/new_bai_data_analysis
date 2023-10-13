@@ -1,6 +1,7 @@
 ---
 title: "Python for Ecological Time Series data"
 permalink: python_0_landing_page
+author_profile: false
 sidebar:
   nav: "python"
 ---

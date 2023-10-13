@@ -1,6 +1,7 @@
 ---
 title: "Installing Python"
 permalink: python_0_installation
+author_profile: false
 sidebar:
   nav: "python"
 ---
