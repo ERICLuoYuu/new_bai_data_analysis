@@ -1,5 +1,5 @@
 ---
-title: "Python for Ecological Time Series data"
+title: "Why you should learn Python"
 permalink: python_0_landing_page
 author_profile: false
 sidebar:

@@ -1,5 +1,5 @@
 ---
-title: "Introduction"
+title: "The Basics of Python"
 permalink: python_1_basics
 author_profile: false
 sidebar:
