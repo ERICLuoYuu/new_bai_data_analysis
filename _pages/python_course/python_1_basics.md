@@ -25,13 +25,13 @@ It is more of a broad intrdocution to all the basics so you have hard of them, b
 all the time! So don't worry if it is a lot of input right now, just try to understand the concepts and you 
 can always come back and find help in here, in the internet or from me directly.
   
-Here are some useful ressources if you get stuck:
+Here are some useful ressources to look things up:
 
-[Link: Tutorials on many topics where you can quickly look up things...](https://www.w3schools.com/python/python_intro.asp)
-[Link: Another nice overview of many functionalities of Python (requires login)...](https://www.w3schhttps://www.geeksforgeeks.org/python-cheat-sheet/)
+[Link: w3schools.com: Tutorials on many topics where you can quickly look up things...](https://www.w3schools.com/python/python_intro.asp)  
+[Link: geeks4geeks.com: Another nice overview of many functionalities of Python (requires login)...](https://www.geeksforgeeks.org/python-cheat-sheet/)  
 Geeksforgeeks requires you to make an account or use e.g. a google login, but it features many tutorials, project ideas, quizzes and so on on many programming languages and general
-topics such as Machine Learning, Data Visualization, Data Science, Web Development and many more
-[Link: Later on we will use the library "Pandas" (so cute!) for data handling. A nice cheat sheet is provided by the developers...](https://pandas.pydata.org/Pandas_Cheat_Sheet.pdf)
+topics such as Machine Learning, Data Visualization, Data Science, Web Development and many more  
+[Link: Pandas cheat sheet: Later on we will use the library "Pandas" (so cute!) for data handling. A nice cheat sheet is provided by the developers...](https://pandas.pydata.org/Pandas_Cheat_Sheet.pdf)  
 
 
 ## 1. General things about Python

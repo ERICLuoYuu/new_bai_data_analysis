@@ -18,7 +18,7 @@ Not to forget: Python is one of the most widely used programming languages of al
   
 The data science platform [Kaggle conducted a similar study in 2022](https://www.kaggle.com/kaggle-survey-2022){:target="_blank"}{:rel="noopener noreferrer"} but specifically for data science and machine learning engineers . In the plot below you can clearly see that Python is the most widely used technology, way before R (R even decreasing in use) and SQL.  
 
-![Stackoverflow survey](assets\images\python\1\kaggle_datascientists.PNG)  
+![kaggle survey](assets\images\python\1\kaggle_datascientists.PNG)  
 
 
 **So with all this said, get ready to join us in Python heaven!**  
