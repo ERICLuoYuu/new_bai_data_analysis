@@ -18,7 +18,6 @@ and run them in your IDE (e.g. Spyder).
 3. [Operators](#3-operators)
 4. [Loops and Conditionals](#4-loops-and-conditionals)
 5. [Functions and Classes](#5-functions-and-classes)
-6. [Numpy and Pandas](#6-data-structures)
 
 Notice that it is not at all expected that you learn all these things and they are burnt into your brain (!!!!!). 
 It is more of a broad intrdocution to all the basics so you have hard of them, but programmers do look up stuff
