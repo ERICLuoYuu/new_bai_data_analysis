@@ -183,5 +183,5 @@ WD_figure = ggplot(wind_data, aes(x=wd)) +
 print(WD_figure)
 ```
 You can look at some further customization options in the documentation or for example here: 
-[Link: sthda.com Intro to Data Visualization](http://www.sthda.com/english/wiki/ggplot2-histogram-plot-quick-start-guide-r-software-and-data-visualization)
+[Link: sthda.com Intro to Data Visualization](http://www.sthda.com/english/wiki/ggplot2-histogram-plot-quick-start-guide-r-software-and-data-visualization){:target="_blank"}{:rel="noopener noreferrer"}  
 

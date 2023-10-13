@@ -142,7 +142,7 @@ plot(data_full$x, data_full$y, col="red", xlab="X", ylab="Y", pch=19)
 Now we add the missing values in red to the plot.
 We can make these points red using the "col" argument for "color" and define the symbols with the "pch" argument.
 You can find a list of all available symbols e.g. here:  
-[Link: sthda.com point shapes](http://www.sthda.com/english/wiki/r-plot-pch-symbols-the-different-point-shapes-available-in-r)
+[Link: sthda.com point shapes](http://www.sthda.com/english/wiki/r-plot-pch-symbols-the-different-point-shapes-available-in-r){:target="_blank"}{:rel="noopener noreferrer"}  
 ```R
 points(data_reduced$x, data_reduced$y, col='black', pch=19)
 ```
