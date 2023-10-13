@@ -91,10 +91,11 @@ correct_decimal
 
 ### Naming of variables, functions, and anything at all
 This is not Python-specific but a very important note!  
-**Always use descriptive names for variables, functions or anything that you give a name!!**  
-Especially in scientific programming you see it time and time again that people are wrapped up in their own head and write variable and function names
-using abbreviations that just came to their mind. This makes code much, **much** harder to read and to use by other people or your own future self.  
-It happens so often that people look back at what they wrote 3 weeks ago and do not understand half of it because they did not give descriptive names.
+**Always use descriptive names for variables, functions or anything that you give a name!**  
+Especially in scientific programming you see it time and time again that people name variables and functions
+using abbreviations that just came to their mind. This makes code much, **much** harder to read and to use by other people or your own future self.
+It happens so often that people look back at what they wrote 3 weeks ago and do not understand half of it because they did not give descriptive names.  
+
 You can also use comments to document your code a bit, but that always takes up extra space, often does not look good because you barely keep the same
 formatting throughout the code and gives the next user more work to do when trying to understand the code. Just making the code explain itself is the best solution of all.  
 Here is a very simple example:  
@@ -133,7 +134,7 @@ mean_monthly_temperature = sum_of_samples/number_of_samples
 ```
 
 ## 2. Data Types and Variables
-As in all programming languages, there are different types of data in Python. It helps organizing the variables and defines, which operations are
+Python knows different types of data. A number is a different kind of variable than a word. That helps organizing the variables and defines, which operations are
 possible with which data. For example, computing the mean of a word would be difficult, just as translating a number to all-uppercase letters...  
 
 In Python you dont have to define the data type yourself because Python is smart and finds the type of data on its own. For example when we define a number  
@@ -150,7 +151,7 @@ Primitive datatypes are simple constructs that consists basically of one chunk o
 **Non-Primitive Datatypes**  
 Non-primitive datatypes consist of aggregations of primitive datatypes. A list for example holds several numbers or words or something else  
 - **list**: An ordered sequence of data, for example [1,2,3] is a list where each of the entries have a specific position and the entries can be accessed by indices
-- **dict**: A non-ordered mapping (meaning that it does not have a first or second entry) that consists of keys and values. Imagine it like a digital telephone-book. The comparison does not hold completely because in theory a telephone book is ordered, but you would never search the 5001231th entry from the telephone book. Instead you would search the phone number of  
+- **dict**: A non-ordered mapping that consists of keys and values. That simply means, we can not get entries from the dictionary by indices (e.g. the 0th entry in a dictionary) but instead grab data from the dictionary by using the key. Imagine it like a digital telephone-book. The comparison does not hold completely because in theory a telephone book is ordered, but you would never search the 5001231th entry in a telephone book. Instead you would search the phone number of  
 Mr. Smith", so you go to the "key" Mr. Smith and get the "value" 0251/1234567.
   
 Lets look at some examples for data types:  
@@ -158,14 +159,14 @@ Lets look at some examples for data types:
 # Primitive datatypes:
 
 letter_a = "a"                  # <-- a string 
-name = "Josefine Exampleperson" # <-- a longer string 
+name = "Josefine" # <-- a longer string 
 age = 24                        # <-- an integer
 total_playtime = 354.5          # <-- a float
 is_injured = False              # <-- a boolean
 
 # Non-Primitive datatypes:
 # list: 
-# a list alwasys enclosed by brackets 
+# a list is alwasys enclosed by brackets 
 # and the items are separeted with commas:
 scores_last_games = [5,3,0,1] 
 # To access the values we can use the index, for example 
@@ -177,53 +178,53 @@ scores_last_games[-2] # <-- gets the second last entry
 # dictionary:
 # is always enclosed by {}, 
 # and has the structure "key":value, lines are separeted by a comma.
-josefine_exampleperson = {
+josefine = {
   "age":age,
   "total_playtime":total_playtime,
   "is_injured":is_injured,
   "scores_last_games":scores_last_games
 }
 # Now the values of the dictionary can be accessed using the key like this:
-josefine_exampleperson["age"]
+josefine["age"]
 24
 # new entries can be added by assigning a value to a new key:
-josefine_exampleperson["trikot_number"] = 9
+josefine["trikot_number"] = 9
 ```
-You can always find the type of a variable by using the type() command:
+You can always find the type of a variable by using the type() function (more on functions later):
 ```python
 type(name)
 type(age)
 type(total_playtime)
 type(is_injured)
 type(scores_last_games)
-type(josefine_exampleperson)
-'''
-type() is also the first example of a **built-in function** we are using here. 
-It is the function called "type" that takes the variable as the "argument" 
-and "returns" the data type.  
-When we use a function we say that we "call" the function. 
-But we will learn more about functions later...
-''' 
+type(josefine)
 ```
 
 It is possible to change the type of a variable, but only if Python is able to understand what the outcome should be.  
 The functions to do that have the same name as the target data type, for example int() or str():
 ```python
 int("10")       # <-- this works
-10
 str(500)        # <-- this works
-'500'
 float(500)      #<-- this works
-500.5
 float("500.5")  #<-- this works
-500.5
 float("abc")    #<-- this won't work, how should you translate a word to a number?
-Traceback (most recent call last):
-  File "<stdin>", line 1, in <module>
-ValueError: could not convert string to float: 'abc'
 ```
-One last thing is important to note. When you assign a non-primitive variable to another variable, the two variables **share** the same data. That means,
-when you manipulate one you also manipulate the other. That can lead to confusion when you don't keep it in mind.  
+One last thing is important to note. When you assign a non-primitive variable to another non-primitive variable, the two variables **share** the same data. That means,
+when you manipulate one you also manipulate the other. This can lead to confusion when you don't keep it in mind.  
+```python
+list_1 = [1,2,3]  # a list is non-primitive
+list_2 = list_1   # here we assign the non-primitive list_1 to the variable list_2
+list_2.append(4)  # we add a fourth value, 4, to list_2
+list_2            # list_2 is now [1,2,3,4]
+list_1            # BUT! list_1 is now also [1,2,3,4]
+
+# We can avoid this and extract the values from list_1 to create a completely new variable by using the .copy() function
+list_1 = [1,2,3]
+list_2 = list_1.copy()    # we copy the values of list_1 to the new variable list_2
+list_2.append(4)          # we add a fourth value, 4, to the list list_2
+list_2                    # list_2 is now [1,2,3,4]
+list_1                    # list_1 is still [1,2,3]
+```
 On the other hand when you assign a variable containing a primitive datatype to another variable, the value gets simply
 copied to the new variable. Here is an example:
 ```python
@@ -232,19 +233,6 @@ b = a     # we assign the value of a to the variable b
 b = b + 1 # we increase the value of b by one
 b         # b is now 6
 a         # a is still 5
-
-list_1 = [1,2,3]
-list_2 = list_1   # here we assign the non-primitive list_1 to the variable list_2
-list_2.append(4)  # we add a fourth value, 4, to the list list_2
-list_2            # list_2 is now [1,2,3,4]
-list_1            # BUT! list_1 is now also [1,2,3,4]
-
-# We can extract the values from list_1 and create a new variable by using the .copy() function
-list_1 = [1,2,3]
-list_2 = list_1.copy()    # we copy the values of list_1 to the new variable list_2
-list_2.append(4)          # we add a fourth value, 4, to the list list_2
-list_2                    # list_2 is now [1,2,3,4]
-list_1                    # list_1 is still [1,2,3]
 ```
 ## 3. Operators
 An operator is something that allows you to interact with variables. Some very examples are mathematical operations or comparisons.  
@@ -253,7 +241,6 @@ An operator is something that allows you to interact with variables. Some very e
 Most operations are very intuitive. For example you can add numbers and also add words to concatenate them, but you can not subtract words from each other...  
 Here is a list of operations:
 ```python
-# Some helper variables:
 a = 5
 b = 10
 word1 = "Hi"
@@ -277,7 +264,7 @@ h = 12 % 5  # Modulus, this returns the remaining amount after fitting one numbe
 <details><summary markdown="span">Solution!</summary>
 
 ```python
-scores = josefine_exampleperson["scores_last_games"]
+scores = josefine["scores_last_games"]
 total_scores = scores[0] + scores[1] + scores[2] + scores[3]
 mean_scores = total_scores / 4
 ```
@@ -285,7 +272,7 @@ mean_scores = total_scores / 4
 and the total number of score-values can be found using the len() function. A one-line solution could look like this:</p>
 
 ```python
-mean_scores = sum(josefine_exampleperson["scores_last_games"]) / len(josefine_exampleperson["scores_last_games"])
+mean_scores = sum(josefine["scores_last_games"]) / len(josefine["scores_last_games"])
 ```
 </details>
 
@@ -301,6 +288,7 @@ mean_scores = sum(josefine_exampleperson["scores_last_games"]) / len(josefine_ex
 ### 3.2 Comparison operations
 Comparison operations are used to compare values with each other in order to make decisions in your script.  
 The output of a comparison is **always** a boolean value that is "True" if the comparison is evaluated as correct and "False" otherwise. 
+
 ```python
 goals_team1 = 5
 goals_team2 = 2
@@ -315,14 +303,14 @@ goals_team1 != goals_team2   # != not equal
 # you can also store the result in a variable:
 is_team1_winner = goals_team1 > goals_team2
 is_team2_winner = goals_team1 < goals_team2
-
 ```
 
 ### 3.3 Logical operators
-Logical operators can combine several comparisons. Namely there are three: **and**, **or** and **not**. The use of these is pretty intuitive.
-If we combine two comparisons with an "and", the result is only True if both conditions hold.  
-If we combine two comparisons with an "or", the result is True if one of the conditions hold.
-Not is a special case, that reverts the result.  
+Logical operators can combine multiple comparisons. Namely there are three: **and**, **or** and **not**. The use of these is pretty intuitive.
+If we combine two comparisons with an "and", the result is only True if all conditions hold.  
+If we combine two comparisons with an "or", the result is True if one of the conditions hold, even if the other is False.
+Not is a special case, that reverts the result. 
+
 ```python
 # Lets use a new example
 peter = {
@@ -355,6 +343,68 @@ c = [a,b]   # here we create a new list that contains the lists a and b
 a in b      # now we can check whether one of the lists is within another list
 a in c
 ```
+
+## Code block in details in a notice
+
+{% capture exercise %}
+
+<h3> Exercise </h3>
+<p style="font-size:18px;">Now you know all about operators. Try to use your knowledge and figure out what we test for in the following operations and what the result is:</p>
+
+{::options parse_block_html="true" /}
+
+```python
+joana = {
+    enrolled = True,
+    grade_ecophysiology = 1.3,
+    grade_archery = 1.3
+}
+alfonso = {
+    enrolled = True,
+    grade_ecophysiology = 1.7,
+    grade_archery = 4.3
+}
+legolas = {
+    enrolled = False,
+    grade_ecophysiology = 4.0,
+    grade_archery = 1.0
+}
+
+# 1.
+a = (legolas["grade_ecophysiology"] < joana["grade_ecophysiology"]) and (legolas["grade_ecophysiology"] < alfonso["grade_ecophysiology"])
+# 2.
+b = (legolas["grade_archery"] < joana["grade_archery"]) and (legolas["grade_archery"] < alfonso["grade_archery"])
+# 3.
+c = not (legolas["grade_ecophysiology"] < joana ["grade_ecophysiology"]) or (alfonso["grade_ecophysiology"] < joana ["grade_ecophysiology"])
+# 4.
+d = joana["enrolled"] and alfonso["enrolled"] and legolas["enrolled"]
+# 5.
+e = alfonso["grade_ecophysiology"] > 4.0 or alfonso["grade_archery"] > 4.0
+# 6.
+f = (alfonso["grade_ecophysiology"] > 4.0 or alfonso["grade_archery"] > 4.0) or (legolas["grade_ecophysiology"] > 4.0 or legolas["grade_archery"] > 4.0) or (joana["grade_ecophysiology"] > 4.0 or joana["grade_archery"] > 4.0)
+
+```
+
+<details><summary markdown="span">Solution!</summary>
+<ol>
+<li>Check 1 tests whether legolas is the best ecophysiologist. The result is False.</li>
+<li>Check 2 tests whether legolas is the best archer. The result is True.</li>
+<li>Check 3 tests whether legolas or alfonso are better ecophysiologists than joana. With the "not" in the beginning, the result is turned into whether Joana is better than any of the two. The result is True.</li>
+<li>Check 4 tests whether everyone is enrolled. The result is False. Legolas is probably buisy somewhere else...</li>
+<li>Check 5 tests whether Alfonso failed one of the exams with a grade higher than 4.0. The result is True.</li>
+<li>Check 6 tests whether anyone failed one of the exams with a grade higher than 4.0. The result is True.</li>
+</ol>
+</details>
+
+{::options parse_block_html="false" /}
+
+{% endcapture %}
+
+<div class="notice--warning">
+  {{ exercise | markdownify }}
+</div>
+
+
 
 # 4. Conditionals and Loops
 Conditionals and loops are constructs in your code that are often combined. A loop is used to do a certain task on many elements sequentially,
@@ -705,3 +755,161 @@ while password_is_bad:
   {{ exercise | markdownify }}
 </div>
 
+## 5.2 Classes
+Classes are the final fundamental building block of Python we will look at here.
+A class basically represents a blueprint of an object that has certain properties. As an example, 
+when I am working with data on ecosystems it could be convenient to have an ecosystem class
+that includes information about the ecosystem type, the location as latitude and longitude, and
+some meteorological data. Lets look at an example:
+```python
+class Ecosystem():
+    def __init__(self, id, IGBP_ecosystem_class, lat, lon, mean_annual_Tair, mean_annual_precip):
+        self.id = id
+        self.IGBP_ecosystem_class = IGBP_ecosystem_class
+        self.lat = lat
+        self.lon = lon
+        self.mean_annual_Tair = mean_annual_Tair
+        self.mean_annual_precip = mean_annual_precip
+```
+
+The definition of a class always begins with the class-keyword followed by the name of the class.
+It always has a first function called __init__() which is also called "constructor". This method is used to 
+create new instances of the class and assigns values to the class. The "self" keyword is in this context 
+always used within a class to reference the class itself. Note, that "self" also has to be in the list of arguments
+for the function, but is does not get passed when you call the function.  
+Many new words but stay with me, it is pretty simple when we look at an example, how we create a new instance:
+```python
+# First we define the class
+class Ecosystem():
+    # see how the first argument here is "self"
+    def __init__(self, id, IGBP_ecosystem_class, lat, lon, mean_annual_Tair, mean_annual_precip):
+        self.id = id
+        self.IGBP_ecosystem_class = IGBP_ecosystem_class
+        self.lat = lat
+        self.lon = lon
+        self.mean_annual_Tair = mean_annual_Tair
+        self.mean_annual_precip = mean_annual_precip
+
+# now we use that class to create a new ecosystem-object, 
+# see how we have to provide every value defined in the constructor except for "self":
+amtsvenn = Ecosystem(id="amtsvenn", IGBP_ecosystem_class = "open shrublands", lat = 52.176, lon = 6.955, mean_annual_Tair = 10.5, mean_annual_precip = 870)
+
+# Now you have stored all the info about amtsvenn in the "amtsvenn"
+# object and can access them whenever you want:
+print(amtsvenn.id)
+print(amtsvenn.IGBP_ecosystem_class)
+print(amtsvenn.lat)
+print(amtsvenn.lon)
+```
+Classes can not only comprise of the information associated with them but
+can also have methods associated specifically with them. For example we can create
+a function that prints all the information enclosed in the object. 
+```python
+
+class Ecosystem():
+    def __init__(self, id, IGBP_ecosystem_class, lat, lon, mean_annual_Tair, mean_annual_precip):
+        self.id = id
+        self.IGBP_ecosystem_class = IGBP_ecosystem_class
+        self.lat = lat
+        self.lon = lon
+        self.mean_annual_Tair = mean_annual_Tair
+        self.mean_annual_precip = mean_annual_precip
+
+    def print_ecosystem_information(self):
+        print("=====================")
+        print("Ecosystem information")
+        print(f"ID: {self.id}")
+        print(f"IGBP ecosystem class: {self.IGBP_ecosystem_class}")
+        print(f"Location (lat/lon): {self.lat}°/{self.lon}°")
+        print(f"Mean annual air temperature: {self.mean_annual_Tair} °C")
+        print(f"Mean annual precipitation: {self.mean_annual_precip} mm")
+
+amtsvenn = Ecosystem(id="amtsvenn", IGBP_ecosystem_class = "open shrublands", lat = 52.176, lon = 6.955, mean_annual_Tair = 10.5, mean_annual_precip = 870)
+
+# After creating the object we can use the classes functions like this:
+amtsvenn.print_ecosystem_information()
+```
+
+{% capture exercise %}
+
+<h3> Exercise 5.2.1 </h3>
+<p style="font-size:18px;">Lets do one exercise that can further show, why classes are great for creating reusable code. 
+Try to write a function called "Statistics". This class will be a "behavioural" class, meaning it does not need to hold
+own data but rather holds some methods, that belong to the same topic. In that class, define functions that calculate the 
+mean, the variance and the standard deviation of a given list. Then use that class to calculate these metrics of an arbitrary list. </p>
+<p style="font-size:18px;"> Hint: For the standard deviation you need to take the square root. You can do that with pythons built-in math module.
+You can use it like this: </p>
+```python
+import math
+math.sqrt(24)
+```
+<p style="font-size:18px;">Try to work out the solution yourself first! There is some starter code below, in case you get stuck though.</p>
+
+{::options parse_block_html="true" /}
+
+<details><summary markdown="span">Starter code</summary>
+```python
+class Statistics():
+    
+    def calculate_mean(self, ...):
+        ...
+    
+    def calculate_variance(self, ...):
+        mean = ...
+        squares = []
+        for value in values:
+            squares.append(...)
+        variance = ...
+        return ...
+    
+    def calculate_stdev(self, ...):
+        variance = ...
+        stdev = ....
+        return ...
+```
+</details>
+
+<br>
+
+<details><summary markdown="span">Solution!</summary>
+
+```python
+import math
+
+class Statistics():
+    
+    def calculate_mean(self, values:list[float]):
+        return sum(values)/len(values)
+    
+    def calculate_variance(self, values:list[float]):
+        mean = self.calculate_mean(values)
+        squares = []
+        for value in values:
+            squares.append((value-mean)**2)
+        variance = sum(squares) / (len(values)-1)
+        
+        return variance
+    
+    def calculate_stdev(self, values:list[float]):
+        variance = self.calculate_variance(values)
+        stdev = math.sqrt(variance)
+        return stdev
+    
+stat = Statistics()
+example_list = [1,2,3,4,5,5,6,7,123,1,1,4]
+mean = stat.calculate_mean(example_list)
+stdev = stat.calculate_stdev(example_list)
+variance = stat.calculate_variance(example_list)
+```
+
+{::options parse_block_html="false" /}
+
+{% endcapture %}
+
+<div class="notice--warning">
+  {{ exercise | markdownify }}
+</div>
+
+We will not go deeper into classes here, but it is very important to understand the concept. Most 
+Python packages are written in object-oriented style, which (in very simple terms) means that the
+methods are enclosed in classes. So knowing the basics makes it much easier to understand the following bits.

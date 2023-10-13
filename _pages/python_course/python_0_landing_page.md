@@ -21,5 +21,5 @@ The data science platform [Kaggle conducted a similar study in 2022](https://www
 
 
 **So with all this said, get ready to join us in Python heaven!**  
-![Python xkcd](assets\images\python\1\python_xkcd.PNG)  
+![Python xkcd](assets\images\python\1\python_xkcd.png)  
 (credits: https://xkcd.com/353/)
