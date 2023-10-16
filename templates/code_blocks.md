@@ -14,18 +14,12 @@ scores = josefine_exampleperson["scores_last_games"]
 total_scores = scores[0] + scores[1] + scores[2] + scores[3]
 mean_scores = total_scores / 4
 ```
-<p >obviously there are better solutions to this, for example the iteration over all scores can be done much better with a loop  
-and the total number of score-values can be found using the len() function. A one-line solution could look like this:</p>
-
-```python
-mean_scores = sum(josefine_exampleperson["scores_last_games"]) / len(josefine_exampleperson["scores_last_games"])
-```
 </details>
 
 {::options parse_block_html="false" /}
 
 {% endcapture %}
 
-<div class="notice--warning">
+<div class="notice--primary">
   {{ exercise | markdownify }}
 </div>

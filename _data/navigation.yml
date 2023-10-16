@@ -21,8 +21,8 @@ python:
     url: python_0_installation
   - title: "1. Basics of Python"
     url: python_1_basics
-  - title: "2. Data Visualization"
-    url: python_2_data_viz
+  - title: "2. Data handling and visualization"
+    url: python_2_data_and_data_viusalization
   - title: "3. Interpolation and Gap Filling"
     url: python_3_interp_gapfill
   - title: "4. Extreme Value Detection"
