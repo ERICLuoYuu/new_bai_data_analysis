@@ -8,9 +8,9 @@ sidebar:
 
 In this second part of the course we will talk about how to handle, process and visualize data in Python. For that purpose we will make use of a few third-party libraries. NumPy and Pandas will help us store the data in array- and matrix-like structures (in Pandas more specifically Dataframes) and do some processing of the data. Pandas already has some visualization capabilities, but for nicer looks and configurability we will make use of the Plotly package. Finally for some analysis of the data we will also take a quick look into the widely used Sciki-Learn package.  
 To underline that these are essential tools in Python, let me once again pull out the Stackoverflow 2023 survey: According to the ~3k respondants, Numpy, Pandas and Scikit-Learn are 3 of the 8 most used technologies in programming across all languages (disregarding web-technologies)!  
-![Stackoverflow 2023 survey technologies](/assets/images/python/2/technologies.PNG)  
+![Stackoverflow 2023 survey technologies](assets/images/python/2/technologies.PNG)  
 
-For this part we will use some example data. It is a dataset from the german weather service DWD from the Diepholz Station (ID 963) ranging from 1996 to 2023. [Click here to download (25mb)...](/assets/data/dwd_diepholz_1996_2023.parquet).  
+For this part we will use some example data. It is a dataset from the german weather service DWD from the Diepholz Station (ID 963) ranging from 1996 to 2023. [Click here to download (25mb)...](assets/data/dwd_diepholz_1996_2023.parquet).  
   
 **Note** The data is in .parquet-format. You may not have heard of it, but this is a very compressed and fast format. For example this dataset with 27 years worth of data, in Parquet this is 25mb of data, in .csv its 208mb.  
 While you can not open .parquet directly in excel or a text editor like a .csv file, it is much much faster to load e.g. when using it in programming languages, which is exactly what we are going to do here.
@@ -48,7 +48,7 @@ from math import sqrt as squareroot # this does not make much sense though
 ## 1. Pandas
 Pandas is around since 2008 and one of the most wiedely used tools for data analysis of all. The usage is all about two types of objects: The pandas Series and the Pandas DataFrame, where a Series is more or less one column of a dataframe (basically a vector). If you already worked with R, the concept of a DataFrame is not new to you. However for starters, a DataFrame is basically a table, in which each row has an index and each column has a label. Simple right?  
   
-![Pandas Dataframe Strcuture](/assets/images/python/2/pandas_df.png)  
+![Pandas Dataframe Strcuture](assets/images/python/2/pandas_df.png)  
 (credit: https://www.geeksforgeeks.org/creating-a-pandas-dataframe/)
   
 
@@ -367,7 +367,7 @@ df_1_plus_one = df_1.apply(lambda x: x+1)
 ## 2. A quick touch on Numpy
 Many Python programmers and data scientists would probably shun me for not giving more time to numpy,
 but we want to get to the applications as fast as possible. However, if you want to know more you can 
-- [download a little Numpy cheat sheet here](/assets/cheatsheets/Numpy_Cheat_Sheet.pdf)
+- [download a little Numpy cheat sheet here](assets/cheatsheets/Numpy_Cheat_Sheet.pdf)
 - [check out the official Numpy documentation](https://numpy.org/doc/stable/index.html){:target="_blank"}{:rel="noopener noreferrer"}
 - [read about numpy at w3schools.com](https://www.w3schools.com/python/numpy/numpy_intro.asp){:target="_blank"}{:rel="noopener noreferrer"}  
 Numpy is like the grandmaster of handling data in Python. It has always been there, it can do everything, but it is not neccessarily pleasant to deal with.  
@@ -475,7 +475,7 @@ rounded_noisy_sin_vector = np.round(noisy_sin_vector, 3)
 
 ## 3. Data Visualization: Plotly
 Finally! It is time to not only create endless boring arrays of numbers, but to mold them into beautiful, descriptive images that tell the story of what the data actually means. Because that is essentially what we are doing when plotting data. Nobody can look at a table of 100.000 rows and start talking about it, that is what we can achieve with data visualization.  
-![plots of amount of black ink](/assets/images/python/2/self_description.png)  
+![plots of amount of black ink](assets/images/python/2/self_description.png)  
   
 There are several libraries we could use for plotting in Python:
 - Matplotlib: One of the most widely used frameworks. It is lightweight, built into Pandas but nobody really likes the syntax
@@ -504,7 +504,7 @@ Within the graph-object there are two layers:
 One is the "data" layer with everything that is directly related to the displayed data. That is the data itself, the mode of repesentation in the graph for example the line (in a line-plot) or points (in a scatter-plot) and the styling such as the size or color of the line/points. In plotly, they also call the group of data-related attributes "traces". Don't ask me how they came up with it but we have to live with it... We will come back to that later!  
 The second part of the figure is the "layout" layer. It includes everything that makes the graph besides the data itself, for example the axes, the titles on the axes, the title of the graph itself, the legend, colors, maybe a template and so on.  
 In the image below I tried to highlight the areas including the "data" area in red and the "layout" related areas in green:    
-![Plot with marked data and layout areas](/assets/images/python/2/ta_2m.png)  
+![Plot with marked data and layout areas](assets/images/python/2/ta_2m.png)  
 
 Lets dive into the code and create a first figure object. Its easy:  
 ```python
@@ -606,9 +606,10 @@ fig.data[0].mode = "lines"
 <h3> Exercise 2 </h3>
 <p>Now lets expand the plot a bit. Add two more lines to the plot, the tair_2m_min and tair_2m_max columns from our dwd data. You can simply add them to the existing plot with the "add_trace()" method. When calling add_trace(), try to directly change the mode to "lines". <br>
 When adding the lines, also add the argument "name" to the add_trace() method. That defines, how the line will be reprented in the legend. Give appropriate names to the lines. <br>
-Additionally, try to change the line style of the min and max temperature to "dashed". If you want, you can also change the colors of the lines. To do so, change the line_color property. To define the color you can use either a string in the form of "rgb(0,0,0)" where you have to replace the zeros with rgb values, or you use one of the pre-defined colors which you can also pass as string. You can find a list of available color-names here: [List of CSS colors](https://www.w3schools.com/cssref/css_colors.php)<br>
+Additionally, try to change the line style of the min and max temperature to "dashed". If you want, you can also change the colors of the lines. To do so, change the line_color property. To define the color you can use either a string in the form of "rgb(0,0,0)" where you have to replace the zeros with rgb values, or you use one of the pre-defined colors which you can also pass as string. You can find a list of available color-names here:<br>
 </p>
-
+ <a href="https://www.w3schools.com/cssref/css_colors.php">w3schools list of CSS colors...</a>
+ 
 {::options parse_block_html="true" /}
 
 <details><summary markdown="span">Solution!</summary>
