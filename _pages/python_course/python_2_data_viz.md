@@ -10,9 +10,9 @@ In this second part of the course we will talk about how to handle, process and 
 To underline that these are essential tools in Python, let me once again pull out the Stackoverflow 2023 survey: According to the ~3k respondants, Numpy, Pandas and Scikit-Learn are 3 of the 8 most used technologies in programming across all languages (disregarding web-technologies)!  
 ![Stackoverflow 2023 survey technologies](/assets/images/python/2/technologies.PNG)  
 
-For this part we will use some example data. It is a dataset from the german weather service DWD from the Diepholz Station (ID 963) ranging from 1996 to 2023. [Click here to download (31mb)...](/assets/data/diepholz_data_1996_2023.parquet).  
+For this part we will use some example data. It is a dataset from the german weather service DWD from the Diepholz Station (ID 963) ranging from 1996 to 2023. [Click here to download (25mb)...](/assets/data/dwd_diepholz_1996_2023.parquet).  
   
-**Note** The data is in .parquet-format. You may not have heard of it, but this is a very compressed and fast format. For example this dataset with 27 years worth of data, in Parquet this is 31mb of data, in .csv its 208mb.  
+**Note** The data is in .parquet-format. You may not have heard of it, but this is a very compressed and fast format. For example this dataset with 27 years worth of data, in Parquet this is 25mb of data, in .csv its 208mb.  
 While you can not open .parquet directly in excel or a text editor like a .csv file, it is much much faster to load e.g. when using it in programming languages, which is exactly what we are going to do here.
 {:.notice}
   
@@ -76,6 +76,8 @@ Another option to create a dataframe is of course to read in data. Lets go ahead
 # import the data from the path "./data/diepholz_data_1996_2023.parquet"
 df_dwd = pd.read_parquet('path_to_file')
 ```
+
+### Accessing rows and column
 Once you createad a dataframe, you can access individual columns by using the column names. Either you can directly access them using brackets, or you use the built-in ".loc"-function. I would recommend getting used to the .loc right away, as it rules out some errors you can run into otherwise. With .loc you always have to provide first the rows you want to access and then the column, separated with a comma. If you want to get all rows, that is done using a colon (":") To get a list of all availabel columns you can simply type "df.columns"  
   
 ```python
@@ -96,14 +98,15 @@ df_dwd.loc[20:,"tair_2m_mean"]      # get all rows after 20 (including 20)
 Note that the .loc examples above all assume numeric index. But Pandas is not restricted to that!
 The index (or "row-label") could also be something like "mean" or "standard-deviation".  
 Keep that in mind for the exercise below!
-  
+
+### Built-in methods to describe the data
 Pandas has a great set of convenience functions for us to look at and 
 evaluate the data we have.  
 - .info() gives us a summary of columns, number of non-null values and datatypes  
 - .head() and .tail() show the first or last five rows of the dataframe  
 - .describe() directly gives us some statistical measures (number of samples, mean, standard deviation, min, max and quantiles)  
-  
 Note that the output of .describe() is again a DataFrame, that you can save in a variable to evaluate it.  
+There are also built-in methods that you can run directly on single columns. Examples of such functions are .mean(), .min(), .max() and .std().
   
 {% capture exercise %}
 
@@ -123,15 +126,23 @@ df.describe().map('{:,.2f}'.format)
 <details><summary markdown="span">Solution!</summary>
 
 ```python
-
-# First get the summary buy saving the output of .describe()
+# There are lots of ways to complete this exercise.
+# You can use the above mentioned describe() method
+# First get the summary. Save the output of .describe()
 # in a new dataframe
 df_dwd_summary = df_dwd.describe().map('{:,.2f}'.format)
 
-# Then to access a value of interest:
+# Then you can access values in that dataframe like this:
 tair_2m_mean = df_dwd_summary.loc["mean", "tair_2m_mean"]
 tair_2m_min = df_dwd_summary.loc["min", "tair_2m_mean"]
 # and so on...
+
+# You could also directly use the pandas built-in .min, .max,
+# .mean and .std methods. For example:
+tiar_2m_mean = df_dwd["tair_2m_mean"].mean()
+tiar_2m_min = df_dwd["tair_2m_mean"].min()
+# and so on...
+
 ```
 </details>
 
@@ -152,6 +163,486 @@ df.describe().map('{:,.2f}'.format).loc[["mean", "std", "min", "max"], ["tair_2m
 </details>
 
 {::options parse_block_html="false" /}
+
+{% endcapture %}
+
+<div class="notice--primary">
+  {{ exercise | markdownify }}
+</div>
+
+### Datetime 
+Pandas has a specific datatype that is extremely useful when we are working with time series data (a s our example DWD dataset). It is called datetime64[ns] and allows us to do a range of super useful things like slicing based on dates or resampling from 10-minute to daily, weekly, monthly data and so on. With datetime-indices, handling timeseries gets so much more convenient.  
+
+```python
+# get data newer than 31.12.2022
+df_dwd[df_dwd["date_time"] > "2022-12-31"]
+
+# get only data from 2022
+df_dwd[df_dwd["date_time"].dt.year == 2022]
+
+# But wait! Its not working, is it?
+# Can you figure out why not? Remember the type() function!
+```
+Now, how do we get this to work for us? Well, the methods work with the datetime64 data type, so we need to change the "date_time" column type! Luckily, Pandas has a function for that. It is called to_datetime() and is part of the main library, so you call it as pd.to_datetime(). It takes the column you want to convert to datetime64 type as argument, tries to parse it to datetime64 and returns the result series. If it fails to parse, maybe because your date_time column is in a country-specific formatting, you can pass an additional "format" argument in which you provide the input format. But we will not cover it here, as the default should work for the DWD dataset.  
+  
+```python
+example_df = pd.DataFrame({
+  "date_time": ["2022-01-01 01:00:00","2022-01-01 12:00:00", "2022-01-02 01:00:00", "2022-01-02 12:00:00", "2022-01-03 01:00:00", "2022-01-03 12:00:00"],
+  "values" : [1,5,4,20,6,-10]
+})
+type(example_df["date_time"])
+example_df["date_time"] = pd.to_datetime(example_df["date_time"])
+```
+
+{% capture exercise %}
+
+<h3> Exercise </h3>
+<p >1. In your dataframe, turn the "date_time" column into a datetime64 type column. Then create dataframes for each season across all years, 
+meaning one for spring, summer, autumn and winter each. The respective months are March to May, June to August, September to November and December to February. Compare the mean air temperature, precipitation and radiation
+between the different seasons.
+<br>
+<br>
+2. Find the dates of the maximum temperatures measured in the dwd dataset.
+<br>
+<br>
+<b>One hint</b>: What we want to do here is to find those rows, where the value is one of a set of values.
+To do so you can use the built-in pandas function .isin(). An example:</p>
+
+{::options parse_block_html="true" /}
+
+```python
+# Here is an example series (representing a column of a dataframe)
+series = pd.Series([1,2,3,1,2,3,1,2,3])
+# Wen want to extract the rows where the value is 1 or 3:
+desired_values = [1,3]
+series_ones_and_threes = series[series.isin(desired_values)]
+# Note that the indices in the extracted series are the ones from series, where the value is 1 or 3,
+# so it really represents an extracted subset of the original series
+```
+
+<details><summary markdown="span">Solution!</summary>
+
+```python
+df_dwd["date_time"] = pd.to_datetime(df_dwd["date_time"])
+df_dwd["date_time"] = pd.to_datetime(df_dwd["date_time"])
+
+# First of all we create 4 dataframes, one for each season
+# We do it by accessing the numeric value of the months in the "date_time"
+# column. 1 refers to January and so on. With the .isin() method we extract
+# those rows where the values correspond to the numbering of the month
+df_dwd_summer = df_dwd.loc[df_dwd["date_time"].dt.month.isin([6,7,8])]
+df_dwd_autumn = df_dwd.loc[df_dwd["date_time"].dt.month.isin([9,10,11])]
+df_dwd_winter = df_dwd.loc[df_dwd["date_time"].dt.month.isin([12,1,2])]
+df_dwd_spring = df_dwd.loc[df_dwd["date_time"].dt.month.isin([3,4,5])]
+
+# To find the mean for each season we have a range of different options
+# how we want to get the means and compare them. I'll show three different
+# ways which are all valid.
+
+# We know we will want to do some operation on all of the 4 datasets, so it is
+# already a good idea to put them in a list. That way we can easily iterate over them
+seasonal_datasets = [df_dwd_spring, df_dwd_summer, df_dwd_autumn, df_dwd_winter]
+
+# Now one option would be to iterate over the datasets and print 
+# the mean values of the desired columns:
+seasons = ["spring", "summer", "autumn", "winter"]
+for idx, df in enumerate(seasonal_datasets):
+    print("----------")
+    print(seasons[idx])
+    print("----------")
+    print(f'mean Ta: {df["tair_2m_mean"].mean()}')
+    print(f'mean precipitation: {df["precipitation"].mean()}')
+    print(f'mean SWIN: {df["SWIN"].mean()}')
+# This way we have the outputs grouped by seasons
+
+# Another option would be to iterate over the variables we want 
+# to evaluate. Then we can print the variable values for each
+# season directly below each other:
+variables = ["tair_2m_mean", "precipitation", "SWIN"]
+
+for idx, variable in enumerate(variables):
+    print("--------")
+    print(variable)
+    print("--------")
+    for i, df in enumerate(seasonal_datasets):
+        stats = df.describe()
+        print(f"{seasons[idx]}: {stats.loc['mean', variable]}")
+
+# Often times we don't even want to print the output but rather
+# just extract and keep it for later use, e.g. for visualizing it later.
+# So another option is to create a new dataframe that holds
+# the seasons as columns and variables as rows. That way we can 
+# just look at the whole new dataframe and easily compare the values
+seasonal_df = pd.DataFrame(columns = seasons)
+
+for idx, df in enumerate([df_dwd_spring, df_dwd_summer, df_dwd_autumn, df_dwd_winter]):
+    season = seasons[idx]
+    seasonal_df.loc["Ta", season] = df["tair_2m_mean"].mean()
+    seasonal_df.loc["Precip", season] = df["precipitation"].mean()
+    seasonal_df.loc["SWIN", season] = df["SWIN"].mean()
+
+print(seasonal_df)
+
+```
+</details>
+
+{::options parse_block_html="false" /}
+
+{% endcapture %}
+
+<div class="notice--primary">
+  {{ exercise | markdownify }}
+</div>
+  
+In this exercise we extracted seasonal information from 5-minute interval data. This type of frequency-conversion is something we do very often when working with time-series data. We also call this operation "resampling". Pandas actually has a great convenience function, that makes resampling a breeze, utilizing the wonderful datetime64-format.  
+  
+The operation consists basically only of two function calls on the pandas dataframe. The first is ".resample()". We must define the column that contains the datetimes with the "on" argument and our target frequency with the "rule" argument as a string. The most useful frequency specifiers are:
+- "S": seconds
+- "T" or "min": minutes
+- "H": hours
+- "D": days
+All of these can be extended with numbers, such as "7D" for 7 days or "30min" for half-hourly values.  
+
+Afterwards we also have to call a function that specifies **how** we want to resample. You see, if we change the frequency from 5 minute data to daily data, the daily value can be computed in different ways. For example for temperature it would make sense to use the daily mean value. For precipitation on the other hand it is probably more useful to get the daily sum, if we are interested in the amount of rain per day. That is why ".resample()" has to be followed by a function like ".mean()" or ".sum()". Here is a full example:  
+```python
+example_date_time = pd.to_datetime(["2022-01-01 01:00:00","2022-01-01 12:00:00", "2022-01-02 01:00:00", "2022-01-02 12:00:00", "2022-01-03 01:00:00", "2022-01-03 12:00:00"])
+
+example_df = pd.DataFrame({
+  "date_time": example_date_time,
+  "values1" : [1,5,4,20,6,-10],
+  "values2" : [100,500,400,2000,600,-1000],
+})
+df_daily_means = example_df.resample(rule="1D", on="date_time").mean()
+df_daily_sums = example_df.resample(rule="1D", on="date_time").sum()
+```
+
+Ok, we have covered quite some ground on handling pandas dataframes. We covered  
+- how to create dataframes
+- how to read data from .csv or .parquet files
+- how indexing works
+- how we get some descriptive information on the data
+- how to compute some informative values such as the min, max and mean of a series
+- even how datetime-indices work (honestly we just scratched the surface, but for an introduction course this is already quite advanced)
+- and how to resample time-series data to another frequency
+Finally I just want to give some "honorable mentions", to tell you about functions with pandas that you will probably need at some point.
+No exercise here, I just want you to have heard of these:
+
+```python
+# 1. pd.concat():
+# this function concatenates dataframes with matching columns or pandas series
+# meaning it simply glues one dataframe on the bottom of the next:
+df_1 = pd.Series([1,2,3])
+df_2 = pd.Series([4,5,6])
+df_3 = pd.concat([df_1, df_2]) 
+# note that we have to put the two dataframes in a list
+
+# 2. pd.merge()
+# This functions combines dataframes based on common indices.
+# It is a rather complex function but this is a simple example 
+# how to combine two dataframes that have overlapping indices:
+df_1 = pd.DataFrame(
+    index = [1,2,3],
+    data = {
+  "col_1": [1,2,3],
+  "col_2": [4,5,6]
+  })
+df_2 = pd.DataFrame(
+    index = [3,4,5],
+    data = {
+  "col_1": [7,8,9],
+  "col_2": [10,11,12]
+  })
+df_3 = df_1.merge(right=df_2, how = "outer")
+
+# 3. df.apply()
+# In the call to apply you can define a function that will be
+# executed on each element of the dataframe:
+df_1_plus_one = df_1.apply(lambda x: x+1)
+
+# don't worry about the "lambda", it simply creates
+# the variable "x" we can use for "x+1". x is only there
+# during the computation and then immediately vanishes again
+```
+
+## 2. A quick touch on Numpy
+Many Python programmers and data scientists would probably shun me for not giving more time to numpy,
+but we want to get to the applications as fast as possible. However, if you want to know more you can 
+- [download a little Numpy cheat sheet here](/assets/cheatsheets/Numpy_Cheat_Sheet.pdf)
+- [check out the official Numpy documentation](https://numpy.org/doc/stable/index.html){:target="_blank"}{:rel="noopener noreferrer"}
+- [read about numpy at w3schools.com](https://www.w3schools.com/python/numpy/numpy_intro.asp){:target="_blank"}{:rel="noopener noreferrer"}  
+Numpy is like the grandmaster of handling data in Python. It has always been there, it can do everything, but it is not neccessarily pleasant to deal with.  
+With Numpy you can create vectors and multi-dimensional matrices, do computations and much more. It is very lightweight (meaning it uses very little memory) and super fast.  
+Actually, Pandas has Numpy as its underlying framework. Every column or row in a pandas datframe
+is actually a Numpy array with fancy extras. That makes Pandas slower than Numpy but also much more convenient to use.  
+While we can do most of our analysis in this course only with Pandas, I think you should know about the basic
+functionality and the core uses of Numpy. So lets take a look at some simple structures and computations:
+  
+### 2.1. Numpy Arrays
+The most used structure in Numpy are arrays. In contrast to normal Python lists, they are faster, they force the values to be homogeneous (e.g. no strings and integers mixed in a Numpy array), 
+and with Numpy arrays you can compute some mathematical operations between arrays such as element-wise addtion, cross-products and so on. 
+Additionally, numpy provides a range of functions you can run directly on arrays, such as .mean(), .min(), .max(), .median() and so on.  
+Generally you can think of Numpy arrays/matrices vs Pandas Dataframes/Series as the difference between pure vectors or structures
+with pure numeric data in them vs. fully fledged and labeled tables.  
+
+There are different ways to create Numpy arrays: 
+```python
+import numpy as np
+# a simple vector is created by calling np.array 
+# with a list as argument:
+vector_1 = np.array([0,1,2,3,4,5])
+
+# alternatively, you can directly create a vector
+# filled with zeros or ones providing a shape.
+# The shape has round brackets and defines the 
+# dimensions of the data structure. For example
+# (2,3) will create a matrix with 2 rows and 3 columns
+vector_zeros = np.zeros(shape=(2,3))
+vector_ones = np.ones(shape=(2,3))
+
+# with np.random.rand() you can create a matrix with 
+# random elements between 0 and 1, by multiplying it
+# you can get e.g. values between 0 and 10:
+vector_randoms_0_to_1 = np.random.rand(3,10)
+vector_randoms_0_to_10 = np.random.rand(3,10)*10
+
+# You can then get individual elements from that 2-D
+# structure with indexing. For example to get the
+# the second element in the first column:
+vector_randoms_0_to_10[0,2] = 2 
+
+# You can find the shape of a numpy object with
+vector_zeros.shape()
+
+# Lastly you can create arrays with consecutive numbers with np.arange()
+# I takes a start, an end and an interval as arguments:
+range_10 = np.arange(0,10,1)
+range_10_halfsteps = np.arange(0,10,0.5)
+# The ranges are created including the first and excluding the 
+# last number.
+```
+
+### 2.2. Useful Numpy functions
+In addition to Numpys own data structures it provides a whole range of 
+useful functions that can be used in other contexts as well.  
+One function I probably use more than any other are np.floor(), np.ceil()
+and np.round(). These all round values. Floor returns the nearest lower integer,
+ceil the nearest upper integer and round rounds to a desired decimal point:
+
+```python
+vector = np.array([1.1, 10.523124, 3.341])
+vector_ceiled = np.ceil(vector)
+vector_floored = np.floor(vector)
+vector_rounded = np.round(vector, 2)
+```
+
+Numpy also provides some mathematical functions and constants. For example  
+np.pi returns the value of pi, np.e returns Eulers number.  
+Other mathematical operations include all angle computations such as np.sin(), np.cos() etc.
+These are all computed in radians, but you can turn them into degrees with np.degrees()
+
+{% capture exercise %}
+
+<h3> Exercise </h3>
+<p >Lets just do one quick exercise on numpy to get familiar. <br>
+1. Create a numpy array from 0 to 20 in steps of 0.1. <br> 
+2. Compute the sin of the data, then compute the standard deviation of the sin data <br>
+3. Add some random noise to the data. To do so, use the np.random.rand(). The range of the noise
+should be between 0 and 0.5. Then compute the standard deviation of the noisy data. <br>
+4. Round the noisy values to 3 decimal places <br>
+ </p>
+{::options parse_block_html="true" /}
+
+<details><summary markdown="span">Solution!</summary>
+
+```python
+vector = np.arange(0,21,.1)
+sin_vector = np.sin(vector)
+std_sin_vector = sin_vector.std()
+noisy_sin_vector = sin_vector + np.random.rand(len(sin_vector))*0.5
+std_noisy_sin_vector = noisy_sin_vector.std()
+rounded_noisy_sin_vector = np.round(noisy_sin_vector, 3)
+```
+</details>
+
+{::options parse_block_html="false" /}
+
+{% endcapture %}
+
+<div class="notice--primary">
+  {{ exercise | markdownify }}
+</div>
+
+
+## 3. Data Visualization: Plotly
+Finally! It is time to not only create endless boring arrays of numbers, but to mold them into beautiful, descriptive images that tell the story of what the data actually means. Because that is essentially what we are doing when plotting data. Nobody can look at a table of 100.000 rows and start talking about it, that is what we can achieve with data visualization.  
+![plots of amount of black ink](/assets/images/python/2/self_description.png)  
+  
+There are several libraries we could use for plotting in Python:
+- Matplotlib: One of the most widely used frameworks. It is lightweight, built into Pandas but nobody really likes the syntax
+- Seaborn: A library built on top of Matplotlib. It makes the syntax quite a bit easier, provides nice out-of-the-box plot styles, but the documentation is a bit lacking and plots are not that easy to customize
+- **Plotly**: The solution we will be using here. Plotly is built on a Javascript library Plotly.js and therefor brings some unique features to the table. The syntax and strcuture is quite good to learn, it offers a load of customization. Additionally, it offers very nice interactivity with the plots which makes exploration of your data much easier
+
+Lucky for us, Plotly is already included in Anaconda, so we do not need to install it.  
+Plotly provides two different approaches to plotting:  
+- Quick and easy plots with less customization using plotly express
+- fully fledged figures with full customization options using graphic-objects
+
+To get a good understanding of Plotly it makes sense to go from large to small, first looking at the general structure of Plotly figures and the way graphic_objects work. If you have a broad overview of these you can still learn about the quick-and-easy ways, but you will have a much easier time when you want to change something about the express solutions manually.  
+  
+### Plotly - The modern plotting library
+
+#### Where to find help
+
+First of all lets gather some ressources. The two best places to find advice about any plotly-related questions are 
+- [the official documentation at plotly.com](https://plotly.com/python/)
+- [the plotly community forum](https://community.plotly.com/)
+- as always, Stackoverflow...
+
+#### The general structure of Plotly figures
+First of all we need to go through a little bit of vocabulary to be able to talk about Plotly. In Plotly-world the whole image of a plot, including the axes, the data, the labels, the title and everything is called the "graph-object". This is the top-level of every Plotly figure and it is also the name of the Python class, with which we build the plots.
+Within the graph-object there are two layers:  
+One is the "data" layer with everything that is directly related to the displayed data. That is the data itself, the mode of repesentation in the graph for example the line (in a line-plot) or points (in a scatter-plot) and the styling such as the size or color of the line/points. In plotly, they also call the group of data-related attributes "traces". Don't ask me how they came up with it but we have to live with it... We will come back to that later!  
+The second part of the figure is the "layout" layer. It includes everything that makes the graph besides the data itself, for example the axes, the titles on the axes, the title of the graph itself, the legend, colors, maybe a template and so on.  
+In the image below I tried to highlight the areas including the "data" area in red and the "layout" related areas in green:    
+![Plot with marked data and layout areas](/assets/images/python/2/ta_2m.png)  
+
+Lets dive into the code and create a first figure object. Its easy:  
+```python
+# First import the graph_objects module from plotly.
+# We call it "go" because that is convention 
+import plotly.graph_objects as go
+# Then we create out figure like this:
+fig = go.Figure()
+
+# Check out what happens, when you print this 
+# object with print(fig). You will see the structure 
+# we talked about above!
+```
+Well, now we have a graph-object without any data. From printing the figure you can see that the "data" is an empty list.  
+Lets change that and add some data from out dwd-dataset. To do so, we have to add a "trace" (remember how we introduced that above). We do that by calling the .add_trace() method on the figure.  
+In the function the first thing we have to define is, what kind of graph we want to create. Otherwise the empty figure wouldn't know whether it should become a scatter-plot, a histogram, a line-plot or anything else. We define the type of graph by giving an object of the graph-type we want to the "add_trace()" method. These objects are also included in our "graph-objects" (or "go"). Sounds complicated, but really it is not. Check this out:  
+
+```python
+# This is the bare figure
+fig = go.Figure()
+# Now we will add some data:
+fig.add_trace(  # On fig we call the "add_trace()" method
+  go.Scatter(   # In the method we provide an object of type "Scatter" from "go"
+    x = df_dwd["date_time"],  # then, in go.Scatter we define, which data should be plotted
+    y = df_dwd["tair_2m_mean"],# on the x- and on the y-axis
+  )
+)
+# Now print the figure again and look the output
+# You will see that the "data" level now has the x- and y-data in it
+# Plotly has very nice interactivity. To open the graph
+# in an interactive browser-window type this:
+fig.show()
+```
+Above we created a scatter-plot (every data point is a dot in the graph). But if you look at the plot, you'll note that there is still a lot missing. Most importantly, it does not have axis-labels. We need to add those, so people know what is plotted here! Lets do it. Which part of the figure do you think we need to change to add axis-labels?  
+<details><summary>Solution</summary>The "layout" bit of the figure </details>  
+  
+So lets see how we can change the layout of the figure!  
+```python
+# to get to the layout of the figure we have two options:
+# 1. The figure object "fig" has the "layout" property,
+# which has an "xaxis" property, which again has a "title"
+# property. We can go down this path manually like this:
+fig.layout.xaxis.title = "Date"
+fig.layout.yaxis.title = "Tair [F]"
+
+# 2. The second option is to use the "update_layout() method.
+# This was was made to make styling more convenient. We can use 
+# it to "group" our styling in a single function call. 
+fig.update_layout(
+  xaxis_title="Date",     # Note that we use an underscore
+  yaxis_title="Tair [F]"  # "_" to grab the "title" property from "xaxis"
+)
+
+# Now you'll see, that the labels are changed in the figure:
+fig.show()
+```
+This is pretty much the way you can change any attribute that is related to the layout of the figure. The only thing you have to figure out for whatever you want to change in your figure is, where the respective property lies. Is it part of the data or the layout layer? Which sub-layers are there? Sometimes you can figure it out by thinking about it, however you can always refer to the documentation and the hive-mind of the internet. Especially in the beginning you'll need to google quite a bite, but once you get the hang of it, it is actually quite intuitive.  
+Lets do some more styling. Above we created a scatter-plot. This is a time-series, so maybe a line-plot would be more appropriate...
+
+{% capture exercise %}
+
+<h3> Exercise 1 </h3>
+<p>Try to change the style of our plot above to a line-plot. To do so, you need to change the "mode" property which is part of the "data" layer, or "trace". You can change the trace just like we changed the "layout" above with a function called "update_traces(). <br>
+<b>Challenge:</b> Can you come up with two different ways to change the mode? 
+</p>
+
+{::options parse_block_html="true" /}
+
+<details><summary markdown="span">Solution!</summary>
+
+```python
+# Option 1:
+fig.update_traces(
+  mode="lines"
+)
+# Option 2 (which you usually wouldn't use):
+fig.data[0].mode = "lines"
+# The trick is that we have to write 
+# fig.data[0], because the "data" property is
+# a list! You can see that if you look at the 
+# printed figures "data" property, it starts with a "[".
+# The reason is of course that you could plot several
+# lines within a single plot. This way you could style
+# them one-by-one. However, generally you use the 
+# "update_traces()" method to apply styles that 
+# are used for all plotted data and pass everything
+# else directly when you create the data with "add_trace()"
+
+```
+</details>
+
+{::options parse_block_html="false" /}
+
+<h3> Exercise 2 </h3>
+<p>Now lets expand the plot a bit. Add two more lines to the plot, the tair_2m_min and tair_2m_max columns from our dwd data. You can simply add them to the existing plot with the "add_trace()" method. When calling add_trace(), try to directly change the mode to "lines". <br>
+When adding the lines, also add the argument "name" to the add_trace() method. That defines, how the line will be reprented in the legend. Give appropriate names to the lines. <br>
+Additionally, try to change the line style of the min and max temperature to "dashed". If you want, you can also change the colors of the lines. To do so, change the line_color property. To define the color you can use either a string in the form of "rgb(0,0,0)" where you have to replace the zeros with rgb values, or you use one of the pre-defined colors which you can also pass as string. You can find a list of available color-names here: <a href=https://www.w3schools.com/cssref/css_colors.php">List of CSS colors </a><br>
+</p>
+
+
+
+{::options parse_block_html="true" /}
+
+<details><summary markdown="span">Solution!</summary>
+
+```python
+fig = go.Figure()
+fig.add_trace(go.Scatter(
+        y = df_plot["tair_2m_mean"],
+        name="Tair 2m",
+        line_color="black"
+    )
+)
+# after adding the first line we just keep adding
+# more lines. We can directly change the name,
+# line_dash and line_color attributes:
+fig.add_trace(go.Scatter(
+        y = df_plot["tair_2m_min"],
+        name="Tair 2m min",
+        line_dash="dash",
+        line_color = "lightblue"
+    )
+)
+fig.add_trace(go.Scatter(
+        y = df_plot["tair_2m_max"],
+        name="Tair 2m max",
+        line_dash="dash",
+        line_color="lightcoral"
+    )
+)
+fig.update_layout(xaxis_title="Date", yaxis_title="T2m [F]")
+fig.show()
+```
+</details>
+
+{::options parse_block_html="false" /}
+
+
 
 {% endcapture %}
 
