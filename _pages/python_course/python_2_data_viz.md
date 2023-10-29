@@ -508,6 +508,11 @@ In the image below I tried to highlight the areas including the "data" area in r
 
 Lets dive into the code and create a first figure object. Its easy:  
 ```python
+
+# Before we start, lets resample the dwd data down to daily values.
+# You will create quite some plots and plotting 27 years of 10-minute
+# data takes a bit of time.
+df_dwd_daily = df_dwd.resample("d", on="date_time").mean()
 # First import the graph_objects module from plotly.
 # We call it "go" because that is convention 
 import plotly.graph_objects as go
@@ -528,8 +533,8 @@ fig = go.Figure()
 # Now we will add some data:
 fig.add_trace(  # On fig we call the "add_trace()" method
   go.Scatter(   # In the method we provide an object of type "Scatter" from "go"
-    x = df_dwd["date_time"],  # then, in go.Scatter we define, which data should be plotted
-    y = df_dwd["tair_2m_mean"],# on the x- and on the y-axis
+    x = df_dwd_daily.index,  # then, in go.Scatter we define, which data should be plotted
+    y = df_dwd_daily["tair_2m_mean"],# on the x- and on the y-axis
   )
 )
 # Now print the figure again and look the output
@@ -601,10 +606,8 @@ fig.data[0].mode = "lines"
 <h3> Exercise 2 </h3>
 <p>Now lets expand the plot a bit. Add two more lines to the plot, the tair_2m_min and tair_2m_max columns from our dwd data. You can simply add them to the existing plot with the "add_trace()" method. When calling add_trace(), try to directly change the mode to "lines". <br>
 When adding the lines, also add the argument "name" to the add_trace() method. That defines, how the line will be reprented in the legend. Give appropriate names to the lines. <br>
-Additionally, try to change the line style of the min and max temperature to "dashed". If you want, you can also change the colors of the lines. To do so, change the line_color property. To define the color you can use either a string in the form of "rgb(0,0,0)" where you have to replace the zeros with rgb values, or you use one of the pre-defined colors which you can also pass as string. You can find a list of available color-names here: <a href=https://www.w3schools.com/cssref/css_colors.php">List of CSS colors </a><br>
+Additionally, try to change the line style of the min and max temperature to "dashed". If you want, you can also change the colors of the lines. To do so, change the line_color property. To define the color you can use either a string in the form of "rgb(0,0,0)" where you have to replace the zeros with rgb values, or you use one of the pre-defined colors which you can also pass as string. You can find a list of available color-names here: [List of CSS colors](https://www.w3schools.com/cssref/css_colors.php)<br>
 </p>
-
-
 
 {::options parse_block_html="true" /}
 
@@ -613,7 +616,7 @@ Additionally, try to change the line style of the min and max temperature to "da
 ```python
 fig = go.Figure()
 fig.add_trace(go.Scatter(
-        y = df_plot["tair_2m_mean"],
+        y = df_dwd_daily["tair_2m_mean"],
         name="Tair 2m",
         line_color="black"
     )
@@ -622,14 +625,14 @@ fig.add_trace(go.Scatter(
 # more lines. We can directly change the name,
 # line_dash and line_color attributes:
 fig.add_trace(go.Scatter(
-        y = df_plot["tair_2m_min"],
+        y = df_dwd_daily["tair_2m_min"],
         name="Tair 2m min",
         line_dash="dash",
         line_color = "lightblue"
     )
 )
 fig.add_trace(go.Scatter(
-        y = df_plot["tair_2m_max"],
+        y = df_dwd_daily["tair_2m_max"],
         name="Tair 2m max",
         line_dash="dash",
         line_color="lightcoral"
@@ -642,7 +645,49 @@ fig.show()
 
 {::options parse_block_html="false" /}
 
+{% endcapture %}
 
+<div class="notice--primary">
+  {{ exercise | markdownify }}
+</div>
+
+Great, you are on the best way to becoming a Data-Painting Plotly-Wizard!  
+Of course there are not just simple line and scatter charts. [There is a whole world of graphs to explore!](https://plotly.com/python/). For now, lets look at just one more type of graph, a bar-chart. This is a common type of graph to compare measured amounts (as opposed to discrete values such as a temperature). Such a value would be our rainfall measurement!  
+
+{% capture exercise %}
+
+<h3> Exercise </h3>
+<p >Go ahead and create a bar chart of the sum of daily rainfall. You can create a bar-chart just like we did with the scatter plots above, only that you call "go.Bar" instead of "go.Scatter" <br>
+<b>Remember</b> that when resampling precipitation to daily values, you need to use the sum instead of the mean!</p>
+
+{::options parse_block_html="true" /}
+
+<details><summary markdown="span">Solution!</summary>
+
+```python
+# First of all we grab daily precipitation data by 
+# resampling with the "sum" aggregation function
+# Here I directly grabbed only the precipitation-column, 
+# but you can also do it another way
+precip = df_dwd.resample(rule="d", on="date_time").sum()["precipitation"]
+
+# Now we create the graph just like before:
+fig_precip = go.Figure()
+fig_precip.add_trace(
+    go.Bar(
+        x=precip.index,
+        y=precip      # Note: when using a Series instead of a dataframe
+    )                 # I dont have to pass the column name, because I 
+)                     # only have one column anyways...
+fig_precip.update_layout(
+    xaxis_title="Date",
+    yaxis_title="Rain amount, daily [mm]"
+)
+fig_precip.show()
+```
+</details>
+
+{::options parse_block_html="false" /}
 
 {% endcapture %}
 
