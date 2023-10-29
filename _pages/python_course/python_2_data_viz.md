@@ -609,14 +609,15 @@ When adding the lines, also add the argument "name" to the add_trace() method. T
 Additionally, try to change the line style of the min and max temperature to "dashed". If you want, you can also change the colors of the lines. To do so, change the line_color property. To define the color you can use either a string in the form of "rgb(0,0,0)" where you have to replace the zeros with rgb values, or you use one of the pre-defined colors which you can also pass as string. You can find a list of available color-names here:<br>
 </p>
  <a href="https://www.w3schools.com/cssref/css_colors.php">w3schools list of CSS colors...</a>
- 
+
 {::options parse_block_html="true" /}
 
 <details><summary markdown="span">Solution!</summary>
 
 ```python
 fig = go.Figure()
-fig.add_trace(go.Scatter(
+fig.add_trace(
+  go.Scatter(
         y = df_dwd_daily["tair_2m_mean"],
         name="Tair 2m",
         line_color="black"
@@ -625,14 +626,16 @@ fig.add_trace(go.Scatter(
 # after adding the first line we just keep adding
 # more lines. We can directly change the name,
 # line_dash and line_color attributes:
-fig.add_trace(go.Scatter(
+fig.add_trace(
+  go.Scatter(
         y = df_dwd_daily["tair_2m_min"],
         name="Tair 2m min",
         line_dash="dash",
         line_color = "lightblue"
     )
 )
-fig.add_trace(go.Scatter(
+fig.add_trace(
+  go.Scatter(
         y = df_dwd_daily["tair_2m_max"],
         name="Tair 2m max",
         line_dash="dash",
@@ -675,7 +678,7 @@ precip = df_dwd.resample(rule="d", on="date_time").sum()["precipitation"]
 # Now we create the graph just like before:
 fig_precip = go.Figure()
 fig_precip.add_trace(
-    go.Bar(
+    go.Bar(           # Here we simply use go.Bar instead of go.Scatter
         x=precip.index,
         y=precip      # Note: when using a Series instead of a dataframe
     )                 # I dont have to pass the column name, because I 
@@ -695,3 +698,51 @@ fig_precip.show()
 <div class="notice--primary">
   {{ exercise | markdownify }}
 </div>
+
+Right on, this was quite a deep dive into the Plotly library! But if you followed all the way down here, you are on a very good way to become super proficient in plotting data in python! The skills you got from the exercise above should get you quite far in designing your own figures in the future.  
+If it is all a bit much in the start, don't worry! As time comes you will do things much faster. For now, keep trying, keep googling, consult the documentation and most importantly: be happy with the progress you make!  
+  
+Before we finish the visualization exercises I want to show a few more very helpful things.  
+Often you want to create not just one but multiple plots in one figure, for example one big figure with a temperature plot on top and a precipitation plot on the bottom. This way readers can easily get an overview of the climate at the station.  
+Creating such a "subplot" in Plotly is super easy! Instead of using go.Figure(), you use a different function to create your top-layer "graph-object". The function we need is plotly.subplots.make_subplots(). In it we can define the number of rows and columns of figures we want to create with the "rows" and "cols" keywords. Think about the whole figure like a matrix. The figure on the top-left will be row 1, column 1, second on the left row 2, column 1 etc.  
+Then whenever you are adding a new trace, you can define its position with the properties "row" and "col":
+```python
+
+# First we create the subplots graph_object.
+# To do so we have to import that specific method:
+import plotly.subplots.make_subplots
+# Now we create a subplot figure with two rows:
+fig_subplots = plotly.subplots.make_subplots(rows=2, cols=1)
+# Now we can start adding traces to the figure:
+fig_subplots.add_trace(
+    go.Scatter(
+        x=df_dwd_daily.index,
+        y=df_dwd_daily.tair_2m_mean,
+        name="Tair mean",
+        line_color = "black"
+    ),
+    row = 1,  # here we define, where the figure should be
+    col=1,
+)
+fig_subplots.add_trace(
+    go.Bar(
+        x=precip.index,
+        y=precip,
+        name="precip",
+        marker_color="blue"
+    ),
+    row = 2,  # precipitation will be the lower plot
+    col=1
+)
+
+fig_subplots.show()
+```
+
+As a little exercise, print the fig_subplots object from above and try to figure out how to change the y-axis titles on the first and the second plot.
+<details><summary>Solution</summary>
+fig_subplots.update_layout(
+    xaxis2_title="Date",
+    yaxis_title="Tair 2m [F]",
+    yaxis2_title="Rain amount, daily [mm]"
+)
+</details>
