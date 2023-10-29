@@ -761,7 +761,7 @@ fig_subplots.show()
 ```  
 Looks nice right?  
 There is a whole gallery of templates available on the website:  
-![Plotly template gallery...](https://plotly.com/python/templates/)
+[Plotly template gallery...](https://plotly.com/python/templates/)
 
 #### Plotly Express and ciao!
 For now, we will leave it with that. But wait, I was talking about an easier way to create graphs before right?  
@@ -774,7 +774,7 @@ fig_express.show()
 # You can update the fig_express just the same as the output
 # of go.Figure(), with update_layout and all of its beauty.
 ```
-The same goes for many other graph types as well. You can find a very nice documentation ![on the plotly website...](https://plotly.com/python/plotly-express/).   
+The same goes for many other graph types as well. You can find a very nice documentation [on the plotly website...](https://plotly.com/python/plotly-express/).   
 I won't go much more into the details because you can easily look up more plotly express functions yourself (and I do encourage you to do so because it is super handy!), but by now you now enough about Plotly to explore that yourself.  
 Why did we go through all the fuzz of handling the traces and layout ourselves? Because express is limited! If you want to customize your plots in some way it does not support out-of-the-box, you **will** have to dive into the figure-structure sooner or later, and now you know how.  
 Still it is encouraged (even by Plotly themselves) to make use of both: run plotly express for a base figure or for quick data exploration, and then style the figure the way you want with the in-depth methods.  
