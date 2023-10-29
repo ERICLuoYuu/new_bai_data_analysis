@@ -542,6 +542,8 @@ fig.add_trace(  # On fig we call the "add_trace()" method
 # Plotly has very nice interactivity. To open the graph
 # in an interactive browser-window type this:
 fig.show()
+# or you save the figure to an image like this:
+fig.write_image("daily_tair_2m_mean.png")
 ```
 Above we created a scatter-plot (every data point is a dot in the graph). But if you look at the plot, you'll note that there is still a lot missing. Most importantly, it does not have axis-labels. We need to add those, so people know what is plotted here! Lets do it. Which part of the figure do you think we need to change to add axis-labels?  
 <details><summary>Solution</summary>The "layout" bit of the figure </details>  
