@@ -703,6 +703,8 @@ Right on, this was quite a deep dive into the Plotly library! But if you followe
 If it is all a bit much in the start, don't worry! As time comes you will do things much faster. For now, keep trying, keep googling, consult the documentation and most importantly: be happy with the progress you make!  
   
 Before we finish the visualization exercises I want to show a few more very helpful things.  
+
+#### Subplots
 Often you want to create not just one but multiple plots in one figure, for example one big figure with a temperature plot on top and a precipitation plot on the bottom. This way readers can easily get an overview of the climate at the station.  
 Creating such a "subplot" in Plotly is super easy! Instead of using go.Figure(), you use a different function to create your top-layer "graph-object". The function we need is plotly.subplots.make_subplots(). In it we can define the number of rows and columns of figures we want to create with the "rows" and "cols" keywords. Think about the whole figure like a matrix. The figure on the top-left will be row 1, column 1, second on the left row 2, column 1 etc.  
 Then whenever you are adding a new trace, you can define its position with the properties "row" and "col":
@@ -747,9 +749,22 @@ fig_subplots.update_layout(
 )
 </details>
 
+#### Templates
+One very nice way to style your figure a bit differently than the default is to use Plotly templates! You can implement them in your figure simply by adding the template in the layout:  
+```python
+fig_subplots.update_layout(
+  template="simple-white"
+)
+fig_subplots.show()
+```  
+Looks nice right?  
+There is a whole gallery of templates available on the website:  
+![Plotly template gallery...](https://plotly.com/python/templates/)
+
+#### Plotly Express and ciao!
 For now, we will leave it with that. But wait, I was talking about an easier way to create graphs before right?  
 Yes, for "quick and dirty" graphs you can use the awesome plotly.express shortcut. With it you can create a bunch of graphs like the ones  we talked about above without all the fuzz of graph_objects etc.  
-All you need to do to create a scatter plot is 
+All you need to do to create a scatter plot is  
 ```python
 import plotly.express as px
 fig_express = px.scatter(df_dwd_daily, y="tair_2m_mean")
@@ -760,4 +775,6 @@ fig_express.show()
 The same goes for many other graph types as well. You can find a very nice documentation ![on the plotly website...](https://plotly.com/python/plotly-express/).   
 I won't go much more into the details because you can easily look up more plotly express functions yourself (and I do encourage you to do so because it is super handy!), but by now you now enough about Plotly to explore that yourself.  
 Why did we go through all the fuzz of handling the traces and layout ourselves? Because express is limited! If you want to customize your plots in some way it does not support out-of-the-box, you **will** have to dive into the figure-structure sooner or later, and now you know how.  
-Still it is encouraged (even by Plotly themselves) to make use of both: run plotly express for a base figure or for quick data exploration, and then style the figure the way you want with the in-depth methods.
+Still it is encouraged (even by Plotly themselves) to make use of both: run plotly express for a base figure or for quick data exploration, and then style the figure the way you want with the in-depth methods.  
+  
+Congratulations to finishing this plot about plotting plots with Plotly! What a journey. I hope you enjoy your future data-adventures a bit more with the techniques I shared here and wish you happy coding!  
