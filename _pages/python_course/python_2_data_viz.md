@@ -6,10 +6,11 @@ sidebar:
   nav: "python"
 ---
 
-In this second part of the course we will talk about how to handle, process and visualize data in Python. For that purpose we will make use of a few third-party libraries. NumPy and Pandas will help us store the data in array- and matrix-like structures (in Pandas more specifically Dataframes) and do some processing of the data. Pandas already has some visualization capabilities, but for nicer looks and configurability we will make use of the Plotly package. Finally for some analysis of the data we will also take a quick look into the widely used Sciki-Learn package.  
-To underline that these are essential tools in Python, let me once again pull out the Stackoverflow 2023 survey: According to the ~3k respondants, Numpy, Pandas and Scikit-Learn are 3 of the 8 most used technologies in programming across all languages (disregarding web-technologies)!  
+In this second part of the course we will talk about how to handle, process and visualize data in Python. For that purpose we will make use of a few third-party libraries. NumPy and Pandas will help us store the data in array- and matrix-like structures (in Pandas more specifically Dataframes) and do some processing of the data. Pandas already has some visualization capabilities, but for nicer looks and configurability we will make use of the Plotly package.    
+To underline that these are essential tools in Python, let me once again pull out the Stackoverflow 2023 survey: According to the ~3k respondants, Numpy, Pandas and Scikit-Learn (which we will use in the next lesson) are 3 of the 8 most used technologies in programming across all languages (disregarding web-technologies)!  
+  
 ![Stackoverflow 2023 survey technologies](assets/images/python/2/technologies.PNG)  
-
+  
 For this part we will use some example data. It is a dataset from the german weather service DWD from the Diepholz Station (ID 963) ranging from 1996 to 2023. [Click here to download (25mb)...](assets/data/dwd_diepholz_1996_2023.parquet).  
   
 **Note** The data is in .parquet-format. You may not have heard of it, but this is a very compressed and fast format. For example this dataset with 27 years worth of data, in Parquet this is 25mb of data, in .csv its 208mb.  
@@ -22,8 +23,7 @@ As a last note: NumPy is one of the older Python libraries and Pandas is actuall
 #### Table of Contents
 1. [Pandas](#1-pandas)
 2. [NumPy](#2-numpy)
-3. [Plotly](#3-operators)
-4. [Scikit-Learn](#4-loops-and-conditionals)
+3. [Plotly](#3-plotly-the-modern-plotting-library)
 
 ## 0. Importing modules
 Just a quick forword on importing libraries in Python. Pandas, Plotly and Numpy are all external libraries we need to import to our script in order to make them work. Usually we would also have to install them, but since we work in Anaconda, this is already taken care of for us!  
