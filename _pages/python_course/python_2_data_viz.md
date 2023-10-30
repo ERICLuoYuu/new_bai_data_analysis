@@ -828,4 +828,4 @@ Still it is encouraged (even by Plotly themselves) to make use of both: run plot
 
 ## Congratulations
 on finishing this plot about plotting plots with Plotly! What a journey. I hope you can take away the knowledge to navigate plotting in Python fairly well from now on! Enjoy your future data-adventures and I wish you happy coding!  
-[Clapping](assets/images/python/2/congrats_2.gif)
+![Clapping](assets/images/python/2/congrats_2.gif)
