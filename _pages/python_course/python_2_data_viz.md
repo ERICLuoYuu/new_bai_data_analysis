@@ -304,6 +304,7 @@ The operation consists basically only of two function calls on the pandas datafr
 All of these can be extended with numbers, such as "7D" for 7 days or "30min" for half-hourly values.  
 
 Afterwards we also have to call a function that specifies **how** we want to resample. You see, if we change the frequency from 5 minute data to daily data, the daily value can be computed in different ways. For example for temperature it would make sense to use the daily mean value. For precipitation on the other hand it is probably more useful to get the daily sum, if we are interested in the amount of rain per day. That is why ".resample()" has to be followed by a function like ".mean()" or ".sum()". Here is a full example:  
+
 ```python
 example_date_time = pd.to_datetime(["2022-01-01 01:00:00","2022-01-01 12:00:00", "2022-01-02 01:00:00", "2022-01-02 12:00:00", "2022-01-03 01:00:00", "2022-01-03 12:00:00"])
 
@@ -315,6 +316,26 @@ example_df = pd.DataFrame({
 df_daily_means = example_df.resample(rule="1D", on="date_time").mean()
 df_daily_sums = example_df.resample(rule="1D", on="date_time").sum()
 ```
+
+I mentioned before that pandas itself already has some built-in plotting capabilities. I won't go deep onto it, but it is definitely worth mentioning because you can use it to get a quick overview of data in a pandas dataframe. You can simply call the ".plot()" function on any dataframe. You can run this on the whole dataframe, which will plot all available columns, or you extract specific rows/columns with the methods we discussed before and then run ".plot()":  
+
+```python
+# lets use the example_df from above:
+# First we plot both values1 and values2:
+example_df.plot(x="date_time")
+# Note that we have to say that we want date_time on the 
+# x-axis, because otherwise it will by default use a numeric
+# index on the x-axis and plot the date_time column against it 
+# as well. You can try it out by leaving the x=... out
+# The figure should now pop up in the "plots" tab on the right
+# side of your Spyder window
+
+# Now we just plot values 1:
+exampl_df.plot(x="date_time", y="values1")
+```
+  
+There is a lot more functionality, but I want to leave the pandas plotting with that, as we will dive deeper into plotting later in this course.  
+
 
 Ok, we have covered quite some ground on handling pandas dataframes. We covered  
 - how to create dataframes
