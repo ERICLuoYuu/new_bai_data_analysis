@@ -494,8 +494,8 @@ To get a good understanding of Plotly it makes sense to go from large to small, 
 #### Where to find help
 
 First of all lets gather some ressources. The two best places to find advice about any plotly-related questions are 
-- [the official documentation at plotly.com](https://plotly.com/python/)
-- [the plotly community forum](https://community.plotly.com/)
+- [the official documentation at plotly.com](https://plotly.com/python/){:target="_blank"}{:rel="noopener noreferrer"}
+- [the plotly community forum](https://community.plotly.com/){:target="_blank"}{:rel="noopener noreferrer"}
 - as always, Stackoverflow...
 
 #### The general structure of Plotly figures
@@ -658,7 +658,7 @@ fig.show()
 </div>
 
 Great, you are on the best way to becoming a Data-Painting Plotly-Wizard!  
-Of course there are not just simple line and scatter charts. [There is a whole world of graphs to explore!](https://plotly.com/python/). For now, lets look at just one more type of graph, a bar-chart. This is a common type of graph to compare measured amounts (as opposed to discrete values such as a temperature). Such a value would be our rainfall measurement!  
+Of course there are not just simple line and scatter charts. [There is a whole world of graphs to explore!](https://plotly.com/python/){:target="_blank"}{:rel="noopener noreferrer"}. For now, lets look at just one more type of graph, a bar-chart. This is a common type of graph to compare measured amounts (as opposed to discrete values such as a temperature). Such a value would be our rainfall measurement!  
 
 {% capture exercise %}
 
@@ -761,7 +761,7 @@ fig_subplots.show()
 ```  
 Looks nice right?  
 There is a whole gallery of templates available on the website:  
-[Plotly template gallery...](https://plotly.com/python/templates/)
+[Plotly template gallery...](https://plotly.com/python/templates/){:target="_blank"}{:rel="noopener noreferrer"}
 
 #### Plotly Express
 For now, we will leave it with that. But wait, I was talking about an easier way to create graphs before right?  
@@ -784,7 +784,7 @@ fig_express = px.scatter(df_dwd_daily)
 fig_express.show()
 ```   
 
-Plotly express includes many other graph types as well. You can find a very nice documentation [on the plotly website...](https://plotly.com/python/plotly-express/).   
+Plotly express includes many other graph types as well. You can find a very nice documentation [on the plotly website...](https://plotly.com/python/plotly-express/){:target="_blank"}{:rel="noopener noreferrer"}.   
 
 
 One very last very useful thing I want to mention here is the addition of trendlines in Plotly Express. It is a super handy feature that is only implemented in Plotly Express, not in plain Plotly. I will show you how to do it and how you can grab all information the trendline can give you, but I will not explain the statistics behind it here.  
