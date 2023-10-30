@@ -763,20 +763,69 @@ Looks nice right?
 There is a whole gallery of templates available on the website:  
 [Plotly template gallery...](https://plotly.com/python/templates/)
 
-#### Plotly Express and ciao!
+#### Plotly Express
 For now, we will leave it with that. But wait, I was talking about an easier way to create graphs before right?  
 Yes, for "quick and dirty" graphs you can use the awesome plotly.express shortcut. With it you can create a bunch of graphs like the ones  we talked about above without all the fuzz of graph_objects etc.  
 All you need to do to create a scatter plot is  
+
 ```python
 import plotly.express as px
 fig_express = px.scatter(df_dwd_daily, y="tair_2m_mean")
 fig_express.show()
 # You can update the fig_express just the same as the output
 # of go.Figure(), with update_layout and all of its beauty.
-```
-The same goes for many other graph types as well. You can find a very nice documentation [on the plotly website...](https://plotly.com/python/plotly-express/).   
-I won't go much more into the details because you can easily look up more plotly express functions yourself (and I do encourage you to do so because it is super handy!), but by now you now enough about Plotly to explore that yourself.  
+```  
+
+Plotly express is very well connected with Pandas. This enables you to display all data of a dataframe in one combined, interactive overview char, simply by passing a pandas dataframe into it:  
+
+```python
+import plotly.express as px
+fig_express = px.scatter(df_dwd_daily)
+fig_express.show()
+```   
+
+Plotly express includes many other graph types as well. You can find a very nice documentation [on the plotly website...](https://plotly.com/python/plotly-express/).   
+
+
+One very last very useful thing I want to mention here is the addition of trendlines in Plotly Express. It is a super handy feature that is only implemented in Plotly Express, not in plain Plotly. I will show you how to do it and how you can grab all information the trendline can give you, but I will not explain the statistics behind it here.  
+It happens very often that you want to plot two variables together, to see whether they are related. In order to explore the relationship, you can fit a linear line to the data and look at the parameters of the line-equation. For example, if I would plot air temperature on the x-axis against the same air-temperature on the y-axis, that would result in a perfect fit, the line would have a slope of exactly 1, the y-axis-intercept would be 0 and the r_square value of the regression would be 1, indicating the perfect fit.  
+In Plotly express you can simply add a trendline to the plot by adding the "trendline" argument to the function call:
+
+```python
+import plotly.express as px
+fig_express = px.scatter(df_dwd_daily, x="pressure_air", y="tair_2m_mean", trendline="ols")
+results = px.get_trendline_results()
+print(results)
+fig_express.show()
+``` 
+But the bare line itself is not too useful, we need to grab the coefficients of the line, so the slope and the intercept of the line-equation.  
+You can grab the results from the figure using px.get_trendline_results(fig_express). Honestly, the actual parameters are a bit hidden inside the deeper objects, but you can extract each one anyways:
+
+
+```python
+import plotly.express as px
+fig_express = px.scatter(df_dwd_daily, x="pressure_air", y="tair_2m_mean", trendline="ols")
+results = px.get_trendline_results(fig_express)
+
+# To actually access the results of the regression we need to 
+# access the first row of the px_fit_results:
+ols_results = results.px_fit_results.iloc[0]
+print(ols_results.summary())
+
+# ols_results is an object of the type "OLSResults"
+# which comes from a different library, "statsmodels" (https://www.statsmodels.org/dev/generated/statsmodels.regression.linear_model.OLSResults.html)
+# From it you can grab the coefficients and a bunch of statistical infos:
+
+slope = ols_results.params[1]
+intercept = ols_results.params[0]
+rsquared = ols_results.rsquared
+# etc...
+``` 
+
+I won't go much more into the details because you can easily look up more plotly express functions (and I do encourage you to do so because it is super handy!), but by now you know enough about Plotly to explore that yourself.  
 Why did we go through all the fuzz of handling the traces and layout ourselves? Because express is limited! If you want to customize your plots in some way it does not support out-of-the-box, you **will** have to dive into the figure-structure sooner or later, and now you know how.  
 Still it is encouraged (even by Plotly themselves) to make use of both: run plotly express for a base figure or for quick data exploration, and then style the figure the way you want with the in-depth methods.  
-  
-Congratulations to finishing this plot about plotting plots with Plotly! What a journey. I hope you enjoy your future data-adventures a bit more with the techniques I shared here and wish you happy coding!  
+
+## Congratulations
+on finishing this plot about plotting plots with Plotly! What a journey. I hope you can take away the knowledge to navigate plotting in Python fairly well from now on! Enjoy your future data-adventures and I wish you happy coding!  
+[Clapping](assets/images/python/2/congrats_2.gif)
