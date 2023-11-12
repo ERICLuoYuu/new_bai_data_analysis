@@ -17,7 +17,7 @@ we first need to handle.
 
 ### 1. Loading and  converting data:
 We will use some data I have prepared in a way that you might find it in an online data portal.  
-[Download the file here](assets/data/dwd_diepholz_1996_2023_missing_placeholders.parquet)
+[Download the file here](/assets/data/dwd_diepholz_1996_2023_missing_placeholders.parquet)
 
 To test some things we will work with the air temperature column "tair_2m_mean" here.
 There are several issues when we have a missing-data-placeholder like that. Try two things:
@@ -119,12 +119,12 @@ where y is the amount of flour in grams and x is the number of people eating cak
 The formula for an interpolation between two points (x1,y1) and (x2,y2) at a specific point
 (xn, yn) is:  
 
-<div> $ yn = y1 + \frac{(y_{2}-y_{1})}{(x_{2}-x_{1})} * (x_{n} - x_{1}) $ </div>
+<div> $$ yn = y1 + \frac{(y_{2}-y_{1})}{(x_{2}-x_{1})} * (x_{n} - x_{1}) $$ </div>
 
 We simply construct a straight line where y1 is our y-intercept, the slope is derived 
 from the two points with the well known slope-formula 
 
-<div> $ m = (y2-y1)/(x2-x1) $ </div> 
+<div> $$ m = (y2-y1)/(x2-x1) $$ </div> 
 
 and our x value on this constructed line is difference between the point we want to look at minus the starting point
 
@@ -209,9 +209,9 @@ temperature way off.
 A simple measure of how well our model performed is to look at the residual standard error. We calculate it
 as
 
-<div> $ \sqrt{\frac{\sum_{i=1}^n (y[i] - ypredicted[i])^2}{df}} $ </div>
+<div> $$ \sqrt{\frac{\sum_{i=1}^n (y[i] - y_predicted[i])^2}{df}} $$ </div>
 
-where y is the true value, ypredicted is the predicted y value, and df is the degrees of freedom. Df is the total
+where y is the true value, y_predicted is the predicted y value, and df is the degrees of freedom. Df is the total
 number of observations used for the model fitting minus the number of model parameters. Since we have 11 total 
 data points of which 3 are missing and we have 2 model parameter we have 6 degrees of freedom.  
 
@@ -255,7 +255,7 @@ and the predicted values. We square it to avoid negative and positive values cou
 
 Looking at an array of n data points we can write  
 
-<div> $ SSE = \sum_{i=1}^n (y(i) - b - m * x(i))^2 $ </div> 
+<div> $$ SSE = \sum_{i=1}^n (y(i) - b - m * x(i))^2 $$ </div> 
   
 y(i) is the true y value at the predicted point, b is the y-intercept of the linear model, 
 m is the first coefficient of the linear model and x(i) is the x-value at the predicted point. 
@@ -268,60 +268,81 @@ To derive the model parameters we can use the following relations where we repla
 (as that is the general standard). Also we will now denote the predicted y-value with a ^ on top of that, which is
 the common standard in literature. Sometimes this is also referred to as y_hat.  
 
-<div> $ \hat{y}_{i} = \alpha + \beta * x_{i} $ </div>
+<div> $$ \hat{y}_{i} = \alpha + \beta * x_{i} $$ </div>
 
-<div> $ \alpha = \bar{y} - (m \bar{x}) $ </div>
+<div> $$ \alpha = \bar{y} - (m \bar{x}) $$ </div>
 
-<div> $ \beta = \frac{\sum_{i=1}^n (x_i - \bar{x})(y_i - \bar{y})}{\sum_{i=1}^n (x_i - \bar{x})^2} $ </div>
+<div> $$ \beta = \frac{\sum_{i=1}^n (x_i - \bar{x})(y_i - \bar{y})}{\sum_{i=1}^n (x_i - \bar{x})^2} $$ </div>
 
 If we would do it by hand, we would simply plug in all the numbers we have into the expression for beta and
 use the result to derive our alpha
 
-Luckily, we have inbuilt functions in R for that.
-To fit a linear model to the data we have in the reduced dataset we can use a simple inbuilt method:
-```R
-model <- lm(data_reduced$y ~ data_reduced$x, data = data_reduced)
+But we are working with Python so we will now introduce an awesome modelling and machine-learning library called
+"scikit-learn".  
+Scikit-learn has a huge amount of model-packages available, from simple linear regression all the way advanced statistical
+regressions, classifications and analysis tools. [The documentation is also quite nice and extensive!](https://scikit-learn.org/stable/index.html)  
+We will make use of scikit-learn to fit a simple linear regression model to our data. However to do so we need to some tweaking of our data.
+Especially two things are important:  
+1. Scikit learn can not work with NaN-data. That means we need to filter these out of the data we feed to the linear model
+2. The model needs two-dimensional data. A list like [1,2,3] is one-dimensional and does not work with creating linear models.
+Instead we have to bring it to a form of [[1],[2],[3]] etc. We can do this using the "reshape" function.
+
+```python
+from sklearn.linear_model import LinearRegression
+# Scikit learn is quite object oriented. That means,
+# we imported a Class called "LinearRegression", which contains
+# all the following functions to work with the model.
+
+# Step 1: instantiate the class
+linearModel = LinearRegression()
+
+# Step 2: Fit the model. This is the process of 
+# feeding our known data to the model and tweaking the
+# parameters so that the prediction error gets minimized.
+# However, sklearn can not work with NaN values, so again
+# we need to leave them out in the fitting:
+
+# --- repetition from before:
+indices_of_present_points = data.loc[data["missing_data"].notna()].index
+x = data.loc[indices_of_present_points,"missing_data"].index.values.reshape(-1,1)
+y = data.loc[indices_of_present_points,"missing_data"].values.reshape(-1,1)
+# --- fitting the model:
+linearModel.fit(x,y)
+
+# Step 3: Check how well our model performed! sklearn has an inbuilt
+# function for it called "score". It returns the R^2 value for 
+# the true values and the values predicted by the model:
+linearModel.score(x,y)
+```  
+We can obtain the paramters of the linear model, that scikit-learn has created for us:
+
+```python
+m = linearModel.coef_
+b = linearModel.intercept_
+print(f"Linear equation: {m}*x+{b}")
 ```
-We provide the dataset that has the information to the "data" argument and specify, which column is supposed
-to be explained by which other column (or which column is dependent on which other column) with data_reduced$y ~ data_reduced$x.
 
-When we print the model we see the paramters of our linear line, that R has fitted for us:
-```R
-model$coefficients
+The last thing left to do is to use this model to predict our missing values.
+All we need to do is use the models "predict()" function and give it the 
+indices we want to prediction for:
+
+```python
+data["sklearn_prediction"] = np.NaN
+data.loc[indices_of_missing_points, "sklearn_prediction"] = linearModel.predict(indices_of_missing_points.values.reshape(-1,1))
 ```
-
-So we  want to have y-values corresponding to the x-indices of 3, 6 and 10
-We compute them by passing the x values at these indices (which are just the indices in this case) to the function
-of our linear model:
-```R
-y_hat_manual = 2.528 * deleted_indices -4.411
-y_hat_manual
-```
-
-
-The same effect can be achieved by using the "predict" function and passing it our model as well as the dataframe
-with the missing values
-```R
-y_hat = predict(model, newdata = data_reduced) #Predictions on Testing data
-y_hat[deleted_indices]
-```
-
-
 
 We can look at out interpolated values by plotting them as red dots together with our reduced dataset:
-```R
-plot(data_reduced$x, data_reduced$y, xlab="X", ylab="Y")
-points(deleted_indices, y_hat[deleted_indices], col='red', pch=19)
-legend(1,28, legend=c("original data", "modelled data"), col=c("black", "red"), pch=c(1,19))
+```python
+scatter_plot_interp(data, ["full_data", "sklearn_prediction", "interpolated_data"])
 ```
 
 
 We can visualize the predicted values of our model as a line by displaying the first and last values of our
 vector as a line plot:
 ```R
-plot(data_reduced$x, data_reduced$y, xlab="X", ylab="Y")
+plot(data_reduced$$x, data_reduced$$y, xlab="X", ylab="Y")
 points(deleted_indices, y_hat[deleted_indices], col='red', pch=19)
-points(deleted_indices, data_full$y[deleted_indices], col='black', pch=19)
+points(deleted_indices, data_full$$y[deleted_indices], col='black', pch=19)
 lines(c(1,11),y_hat[c(1,11)])
 legend(1,28, 
        legend=c("reduced data", "modelled data", "true data", "regression line"), 
@@ -381,7 +402,7 @@ data_site_daily = data_site
 First we set the datetime column in our copied dataframe to a "Date" type. That gets rid of the time information and 
 only leaves us with yyyy-mm-dd information
 ```R
-data_site_daily$datetime = as.Date(data_site_daily$datetime)
+data_site_daily$$datetime = as.Date(data_site_daily$$datetime)
 data_site_daily
 
 ```
@@ -416,7 +437,7 @@ site_precip_daily = data_site_daily %>%
   group_by(datetime) %>%
   dplyr::summarize(RR = sum(RR)) %>%
   as.data.frame()
-data_site_daily$RR = site_precip_daily$RR
+data_site_daily$$RR = site_precip_daily$$RR
 ```
 
 
@@ -434,18 +455,18 @@ data_site_daily_reduced = data_site_daily
 Now we set the values in our copied dataframe for temperature and dewpoint temperature at the specified indices
 in removed_indices to NA
 ```R
-data_site_daily_reduced[removed_indices,]$T = NA
-data_site_daily_reduced[removed_indices,]$DP = NA
-plot(data_site_daily_reduced$T, pch=19, col="black", cex=.5, xlab="Day", ylab="T [°C]")
+data_site_daily_reduced[removed_indices,]$$T = NA
+data_site_daily_reduced[removed_indices,]$$DP = NA
+plot(data_site_daily_reduced$$T, pch=19, col="black", cex=.5, xlab="Day", ylab="T [°C]")
 ```
 
 When we try to simply interpolate with the pointwise linear interpolation, 
 you will see that we get a pretty uninformed output:
 ```R
-model = approx(data_site_daily_reduced$T, n=1000)
+model = approx(data_site_daily_reduced$$T, n=1000)
 
-plot(model$x, model$y, pch=19, col="red", cex=.5, xlab="Day", ylab="T [°C]")
-points(data_site_daily_reduced$T, col="black",cex=.5, pch=19)
+plot(model$$x, model$$y, pch=19, col="red", cex=.5, xlab="Day", ylab="T [°C]")
+points(data_site_daily_reduced$$T, col="black",cex=.5, pch=19)
 legend(10,25, legend=c("true data", "modelled data"), col=c("black", "red"), pch=c(19,19))
 ```
 
@@ -483,11 +504,11 @@ you will not have that data available!
 #                                       Insert here         Insert here      .....
 #                                             |                    |
 #                                             V                    V
-model = lm(data_site_daily_reduced$T ~ <FIRST VARIABLE> + <SECOND_VARIABLE> + ..., 
+model = lm(data_site_daily_reduced$$T ~ <FIRST VARIABLE> + <SECOND_VARIABLE> + ..., 
            data = data_site_daily_reduced)
 
 #prediction = predict(...)
-#plot(data_site_daily$T, , xlab="Day", ylab="T [°C]")
+#plot(data_site_daily$$T, , xlab="Day", ylab="T [°C]")
 #points(prediction, col="red", pch=19)
 #legend(10,25, legend=c("true data", "modelled data"), col=c("black", "red"), pch=c(1,19))
 
@@ -596,7 +617,7 @@ predValid <- predict(rfmodel, ValidSet)
 
 Lets take a look at how the model output looks compared to the actual data:
 ```R
-plot(ValidSet$T, xlab="Day", ylab="T [°C]")
+plot(ValidSet$$T, xlab="Day", ylab="T [°C]")
 points(predValid, pch=19, col="red")
 legend(110,26, legend=c("true data", "modelled data"), col=c("black", "red"), pch=c(1,19))
 ```
@@ -606,8 +627,8 @@ legend(110,26, legend=c("true data", "modelled data"), col=c("black", "red"), pc
 Now we calculate some metrics to evaluate our model performance: 
 ```R
 metrics = data.frame(
-    "RMSE" = sqrt(mean((ValidSet$T - predValid)^2)),
-    "R^2" = cor(ValidSet$T, predValid)^2
+    "RMSE" = sqrt(mean((ValidSet$$T - predValid)^2)),
+    "R^2" = cor(ValidSet$$T, predValid)^2
     )
 metrics
 ```
@@ -624,10 +645,10 @@ predgap <- predict(rfmodel, data_site_daily_reduced[removed_indices,])
 
 To compare our results, we can plot the reduced data, the true valus and our model output together:
 ```R
-plot(data_site_daily_reduced$T, xlab="Day", cex=0.85, ylab="T [°C]")
+plot(data_site_daily_reduced$$T, xlab="Day", cex=0.85, ylab="T [°C]")
 points(removed_indices,predgap, pch=19, cex=0.85, col="red")
 
-#points(removed_indices,data_site_daily$T[removed_indices], cex=0.85, pch=19, col="black")
+#points(removed_indices,data_site_daily$$T[removed_indices], cex=0.85, pch=19, col="black")
 #legend(1,25, legend=c("gap data", "modelled data", "true data"), col=c("black", "red", "black"), pch=c(1,19, 19))
 legend(1,25, legend=c("gap data", "modelled data"), col=c("black", "red"), pch=c(1,19))
 ```
@@ -636,8 +657,8 @@ Also look at the plot above with the true data plotted (remove the commenting si
 Now we calculate some metrics to evaluate our model performance: 
 ```R
 metrics = data.frame(
-    "RMSE" = sqrt(mean((data_site_daily$T[removed_indices] - predgap)^2, na.rm=TRUE)),
-    "R^2" = cor(data_site_daily$T[removed_indices], predgap,  use="complete.obs")^2
+    "RMSE" = sqrt(mean((data_site_daily$$T[removed_indices] - predgap)^2, na.rm=TRUE)),
+    "R^2" = cor(data_site_daily$$T[removed_indices], predgap,  use="complete.obs")^2
     )
 metrics
 ```
