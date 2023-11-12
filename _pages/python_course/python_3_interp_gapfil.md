@@ -154,11 +154,12 @@ quick little function to keep a bit of styling:
 
 ```python
 import plotly.express as px
-def scatter_plot_interp(data, columns:list[str]):
+def scatter_plot_interp(data, columns:list[str], show=True):
     fig = px.scatter(data, y=columns)
     fig.update_traces(marker_size=10)
     fig.update_layout(template="simple_white")
-    fig.show()
+    if show:
+      fig.show()
     return fig
 scatter_plot_interp(data, ["full_data", "missing_data"])
 ```
@@ -327,193 +328,211 @@ All we need to do is use the models "predict()" function and give it the
 indices we want to prediction for:
 
 ```python
+# first we create a new column consisting of NaN values
 data["sklearn_prediction"] = np.NaN
-data.loc[indices_of_missing_points, "sklearn_prediction"] = linearModel.predict(indices_of_missing_points.values.reshape(-1,1))
+# then we replace the values in the missing rows with our model prediction:
+linear_prediction = linearModel.predict(indices_of_missing_points.values.reshape(-1,1))
+data.loc[indices_of_missing_points, "sklearn_prediction"] = linear_prediction
 ```
 
 We can look at out interpolated values by plotting them as red dots together with our reduced dataset:
 ```python
-scatter_plot_interp(data, ["full_data", "sklearn_prediction", "interpolated_data"])
+fig_linmod = scatter_plot_interp(data, ["full_data", "sklearn_prediction"], show=False)
 ```
+As you can see, the linear model already performs a bit better than the simple linear interpolation does. 
+We can visualize the linear regression line by predicting the full array of x-values and plotting
+the result as a line:
 
-
-We can visualize the predicted values of our model as a line by displaying the first and last values of our
-vector as a line plot:
-```R
-plot(data_reduced$$x, data_reduced$$y, xlab="X", ylab="Y")
-points(deleted_indices, y_hat[deleted_indices], col='red', pch=19)
-points(deleted_indices, data_full$$y[deleted_indices], col='black', pch=19)
-lines(c(1,11),y_hat[c(1,11)])
-legend(1,28, 
-       legend=c("reduced data", "modelled data", "true data", "regression line"), 
-       col=c("black", "red", "black"), 
-       lty=c(NA,NA,NA,1), 
-       pch=c(1,16,16,NA))
+```python
+data["yhat_full"] = linearModel.predict(data.index.values.reshape(-1,1))
+fig_linmod.add_traces(
+    go.Scatter(
+        x = data.index,
+        y = data["yhat_full"],
+        mode="lines",
+        name="linear regression line"
+    )
+)
+fig_linmod.show()
 ```
-
-
 Finally we need to look at statistical metrics to find out, how well our linear model performed.
-Luckily we can easily get a comprehensive overview of statistical metrics in R by calling the summary() 
-function on the linear model:
-```R
-summary(model)
+Luckily we can easily get a whole range of such metrics from the sklearn.metrics package. 
+Lets define a simple function to grab a bunch of metrics at once:
+
+```python
+
+import sklearn.metrics as metrics
+def regression_results(y_true, y_pred):
+
+    # Regression metrics
+    mse=metrics.mean_squared_error(y_true, y_pred) 
+    median_absolute_error=metrics.median_absolute_error(y_true, y_pred)
+    r2=metrics.r2_score(y_true, y_pred)
+
+    print('r^2: ', round(r2,4))
+    print('MAE: ', round(median_absolute_error,4))
+    print('MSE: ', round(mse,4))
+    print('RMSE: ', round(np.sqrt(mse),4))
 ```
 
 A few things we can take from this are:  
-**a)** The adjusted R^2 is 0.8076, which is the ratio of the sum of squared errors divided by the sum of squared
-deviations from the mean. You can say that r_squared is a measure of how much of the variance in the original
+**a)** r^2 is 0.8351, which is the ratio of the sum of squared errors divided by the sum of squared
+deviations from the mean. You can say that r^2 is a measure of how much of the variance in the original
 data is reflected by the model. In this case, as our model is just a line, the amount of variance captured in the model
-and stems from the linear trend that is inherent in the original data.
+stems from the linear trend that is inherent in the original data.
 
-Whether an R^2 is good or bad depends heavily on the application. If you are a social scientist and work on 
+Whether an r^2 is reflective of a good correlation depends heavily on the application. If you are a social scientist and work on 
 voter behaviour an r_square of 0.65 may be spectacularly good. If you want to calibrate your measurement device
-and the reference and measured values have an r_square of less than 0.85 you might want to check it again...
+and the reference and measured values have an r^2 of less than 0.85 you might want to check it again...
 
-**b)** The residual standard error is the square root of the sum of squared errors divided by the degrees of freedom. 
-In plain words you could say that it shows how much you can expect the model to be wrong on average. So when
-we apply our model we have to take care not to overinteprete small changes in our modelled data.
+**b)** The mean squared error (MSE) is exactly that: we calculate the distance from each datapoint to its predicted counterpart,
+and to avoid negative errors counterbalancing positive ones, we square them. Then we take the mean of all errors. Due to the squaring
+the errors get quite high and are not directly interpretable. That is why we take the square root of the squared errors and get to the
+"root mean square error" (RMSE). This is an error very often reported in model performance evaluation, also often used in scientific papers.
+
+**c)** Lastly the median absolute error (MAE) is a different performance metric that gets shown not as often, but is still very useful.
+For the MAE, we also calculate each error, take the absolute of it (make negative values positive) and then grab the median value,
+so the one that sits right in the middle of all datapoints. Because we take the median instead of the mean, this metric is insensitive
+to outliers. If we have very low errors, but then a few extremely high ones (or the other way around), the mean value can be skewed
+while the median would not change.  
 
 We wont go much deeper into statistical metrics here. But as you can see, this model does represent certain characteristics
 of the data regarding its variance (judging by the rsquare of > 0.8)
 but has a pretty high average error of more than 4 while we are in a 
 domain of data that only reaches from 1 to 27.
 
-
-
 ### Part 2.3: Multiple linear models
 
 Lets look at another way to make our models a bit more flexible
-With lm() we created a linear model with only one parameter. Obviously that did not catch all of the variance in our 
-data. In reality we often have more variables at hand which can help us explain the measure of interest.
-For example to fill gaps in temperature data instead of using only the time of day, we could add variables
+So far we created a linear model with only one parameter. Obviously that did not catch all of the variance in our 
+data. In reality we often have more data at hand which can help us explain the measure of interest.
+For example to fill gaps in temperature data instead of only using the indices to predict, we could add variables
 such as the incoming radiation or the relative humidity of the air.
 
-
-
-First lets load in some actual data and aggregate it to daily values:
-For the aggregation we can use the same function we used in the previous lecture:
-
-First we make a copy of the original dataframe to a new variabl to work non-destructive (meaning, we keep the original
-data intact)
-```R
-data_site_daily = data_site
-```
-
-First we set the datetime column in our copied dataframe to a "Date" type. That gets rid of the time information and 
-only leaves us with yyyy-mm-dd information
-```R
-data_site_daily$$datetime = as.Date(data_site_daily$$datetime)
-data_site_daily
-
-```
-
-
-Now we can use a dplyr pipeline to do the actual resampling of the data:
-We insert the dataframe with daily values into the pipeline with the %>% operator
-
-```R
-data_site_daily = data_site_daily %>%
-```
-Now we use the group_by() function to grab all the data that belongs to each day
-```R
-  group_by(datetime) %>%
-```
-Then we use another dplyr function, summarize_if() to aggregate the data. To the function we pass two arguments:
-1. we say that we only want to summarize if the data is numeric. Thereby we prevent that e.g. the date column is summarized as well
-2. We pass an argument that defines, HOW we want to aggregate the data. In this case "mean", taking the average
-for each day as the new value
-```R
-  dplyr::summarize_if(is.numeric, mean) %>%
-```
-Finally we specify the datatype of our output, which is a data.frame
-```R
- as.data.frame()
-```
-Just like before, for precipitation we do not want the data to be averaged but rather summarized.
-We do the exact same pipeline as above, except this time we use th dplyr summarize() function instead of the 
-summarize_if() function and pass it the sum() function as the method of aggregation.
-```R
-site_precip_daily = data_site_daily %>%
-  group_by(datetime) %>%
-  dplyr::summarize(RR = sum(RR)) %>%
-  as.data.frame()
-data_site_daily$$RR = site_precip_daily$$RR
-```
-
-
-
-Once again I replace some values by NA to create a gap in the data for temperature and also for the dewpoint temperature, as that is calculated from air temperature.
-
-First we define a range of values to delete:
-```R
-removed_indices = c(320:360)
-```
-Now again we create a dataset as a copy of the original to not temper with the original data:
-```R
-data_site_daily_reduced = data_site_daily
-```
-Now we set the values in our copied dataframe for temperature and dewpoint temperature at the specified indices
-in removed_indices to NA
-```R
-data_site_daily_reduced[removed_indices,]$$T = NA
-data_site_daily_reduced[removed_indices,]$$DP = NA
-plot(data_site_daily_reduced$$T, pch=19, col="black", cex=.5, xlab="Day", ylab="T [°C]")
-```
+Lets continue working with the dwd data we used before. Load it just like we did in the previous exercises
 
 When we try to simply interpolate with the pointwise linear interpolation, 
-you will see that we get a pretty uninformed output:
-```R
-model = approx(data_site_daily_reduced$$T, n=1000)
+you will see that we get a pretty uninformed output.
 
-plot(model$$x, model$$y, pch=19, col="red", cex=.5, xlab="Day", ylab="T [°C]")
-points(data_site_daily_reduced$$T, col="black",cex=.5, pch=19)
-legend(10,25, legend=c("true data", "modelled data"), col=c("black", "red"), pch=c(19,19))
-```
-
-Once again we will create a model to reconstruct our missing data. However, this time we have a whole dataset
+We will now create a more sophisticated model to reconstruct our missing data. However, this time we have a whole dataset
 of predictors to choose from.  
 Since we want to fill a gap in temperature data, we need to find predictors that are well correlated with 
 temperature. To figure out which ones are suitable we can make use of the correlation matrix.  
 A correlation matrix is a normalized form of a covariance matrix. The values vary between -1 and 1. 
 A value of 1 signals a perfect positive, -1 a perfect negative correlation. 0 means that the two variables are not
-correlated at all.  
+correlated at all. With pandas you can get the full correlation matrix with all variables with the .corr() function:
 
-
-```R
-cor = cor(data_site_daily_reduced[,3:18],  use = "complete.obs", method="pearson")
-cor
-
+```python
+# lets look at the correlation matrix
+df_dwd.corr()
+# you can plot and explore it with plotly.
+# The interactivity is really handy here:
+px.imshow(df_dwd.corr()).show()
+# To get all correlations with tair_2m_mean we have to index it:
+df_dwd.corr()["tair_2m_mean"]
 ```
-
-As you can see in the output of the code above, all the values on the diagonal are 1. Variables with themselves
-are perfectly correlated.   
-  
 Try to figure out, which variables could be suitable to fill the gaps in our data from the below table.
-But beware: DP is the dewpoint temperature, which is calculated from the air temperature. So for the gaps
-you will not have that data available!
 
+Now we can go ahead and start building our multivariate model! Let go!
+Before we really start plugging the data into the model we need to do a bit of 
+preparation:  
+Since the model has to be fit with data where all the predictors we want are present AND
+we have observation data of our target variable to train the model on, we first need to find that
+data. We can do that easily by dropping the rows, where these columns are na with "dropna()":
 
-```R
-# Once you have decided on predictors to use, you can go and create your model. 
-# 1. Insert your predictors into the model below .
-# You can add more than one predictor by concatenating them with a + behind the "~":
-# 2. predict the missing data with the predict() function by passing in the model and the reduced dataset
-# 3. Plot the true data and your prediction and evaluate the model performance using the summary() function.
-#    Did the model perform well? You can try out different predictors and see which ones work best and which
-#    do not increase model performance.
-#                                       Insert here         Insert here      .....
-#                                             |                    |
-#                                             V                    V
-model = lm(data_site_daily_reduced$$T ~ <FIRST VARIABLE> + <SECOND_VARIABLE> + ..., 
-           data = data_site_daily_reduced)
-
-#prediction = predict(...)
-#plot(data_site_daily$$T, , xlab="Day", ylab="T [°C]")
-#points(prediction, col="red", pch=19)
-#legend(10,25, legend=c("true data", "modelled data"), col=c("black", "red"), pch=c(1,19))
-
-#summary(model)
+```python
+present_data = df_dwd.loc[:,["SWIN","rH","tair_2m_mean"]].dropna()
 ```
+
+Now we want to split these into the data we use as predictors (y) and the data we want to 
+predict (x, also called the "predictand"):
+
+```python
+
+y = present_data.loc[:,["SWIN","rH"]]
+x = present_data.loc[:,["tair_2m_mean"]]
+```
+
+Finally one last very important step is that we need to split our available data into two parts:
+a training and a testing dataset. The training data will ONLY be used for creating (or "fitting")
+the model. To test the performance of the model, we keep a fraction of the available data out 
+of the training set. That way we can predict the testing data and compare it to the real results.
+We are working with some artificiallly created gaps in the data here, but in real life you would 
+otherwise have no way to test, how well your model actually predicts data.  
+It is extremely important to do this split, because you can never test a model on data that it 
+has already seen during its training phase. That would skew your results and make it look better than
+it actually is.  
+Luckily, because this is such a common task to do, scikit learn has us covered with a very simple function
+to do the splitting:
+```python
+from sklearn.model_selection import train_test_split 
+# creating train and test sets 
+X_train, X_test, y_train, y_test = train_test_split( 
+	x, y, test_size=0.3, random_state=42) 
+```
+
+Now that we have our final training and testing datasets ready for use, we can go ahead and fit our model!
+
+```python
+linearModel = LinearRegression()
+# Only training data used for fitting:
+linearModel.fit(X_train,y_train)
+# Only testing data used for the score:
+linearModel.score(X_test,y_test)
+
+# You can plot the prediction for the testing period
+# as a scatter plot to get an idea of the spread
+# of the errors. Put true values on one axis and predicted on the other:
+yhat = linearModel.predict(X_test).reshape(1,-1)[0]
+px.scatter(x=yhat,y=y_test["tair_2m_mean"]).show()
+```
+As you can see the score is roughly 0.36. That is not exactly great but does indicate
+a weak correlation between predicted and true values. 
+
+{% capture exercise %}
+
+<h3> Exercise </h3>
+<p >Do a linear interpolation and 1-D linear model prediction for this same data.
+Do any of them perform equally good or better than the multiple regression? </p>
+
+{::options parse_block_html="true" /}
+
+<details><summary markdown="span">Solution!</summary>
+
+```python
+#------- interpolation:
+interpolated_data = np.interp(
+    y_test.index,
+    y_train.index,
+    y_train["tair_2m_mean"])
+
+regression_results(y_test, interpolated_data)
+
+
+#-------- 1-D linear model:
+y = present_data.loc[:,["tair_2m_mean"]].values.reshape(-1,1)
+x = present_data.index.values.reshape(-1,1)
+
+from sklearn.model_selection import train_test_split 
+# creating train and test sets 
+X_train, X_test, y_train, y_test = train_test_split( 
+	x, y, test_size=0.3, random_state=101) 
+
+linearModel = LinearRegression()
+linearModel.fit(X_train,y_train)
+y_hat = linearModel.predict(X_test)
+regression_results(y_test, y_hat)
+```
+</details>
+
+{::options parse_block_html="false" /}
+
+{% endcapture %}
+
+<div class="notice--primary">
+  {{ exercise | markdownify }}
+</div>
+
 
 ### 2.4: Machine Learning approaches (example Random Forests)
 Here we will just take a quick look at a machine learning method which is commonly used for gap filling applications,
