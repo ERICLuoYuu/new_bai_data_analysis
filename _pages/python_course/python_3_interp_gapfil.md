@@ -217,7 +217,9 @@ A simple measure of how well our model performed is to look at the root mean squ
 
 <div> $$ RMSE = \sqrt{\overline{(y[i] - ypred[i])^2}} $$ </div>
 
-where y is the true value and ypred is the predicted y value. 
+where y is the true value and ypred is the predicted y value. You simply compute the model error for 
+each datapoint and square them to avoid counter balancing of negative and positive errors. Then you take 
+the mean of these values and finally take the square root, to get back into your data range.
 
 {% capture exercise %}
 
