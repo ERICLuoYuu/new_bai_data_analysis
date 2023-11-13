@@ -167,21 +167,23 @@ scatter_plot_interp(data, ["full_data", "missing_data"])
 Since the two plots overlay each other, you can see the "missing" values in blue and all the ones
 in the reduced dataset in red.  
 
-To do a linear interpolation between each adjacent points you can use a numpy function, np.interp().
+To do a linear interpolation between each adjacent points you can use a numpy function, np.interp() or a built-in pandas method.
 You can find its documentation [here](https://numpy.org/doc/stable/reference/generated/numpy.interp.html).  
 The function takes 3 main arguments: 
 1. The x-coordinates for which the data shall be interpolated
 2. The x-coordinates of the input data
 3. The y-values of the input data
 
-The catch however is that the function will return NaN if there are NaN-values in the input arrays.  
-That means we have to handle the NaNs before. Specifically we will do the following:  
+The catch with the numpy function however is that the function will return NaN if there are NaN-values in the input arrays. 
+The pandas function is a lot easier, but we will have to deal more with this problem of getting rid of NaN values later when we use other models,
+so we can practice getting rid of NaN data in our training data now anyways.  
+Specifically we will do the following:  
 - find indices of NaN values
 - find indices of non-NaN-values
-- give ONLY the non-NaN-values as the 2nd and 3rd argument
-- give only the NaN-indices as the first argument
-
-function: 
+- first argument is where to interpolate, so provide the indices of the NaN values
+- second and third arguments are the x and y values of the adjacent non-NaN values,
+so provide the index and the y-values at the non-NaN indices
+ 
 ```python
 # 1. get indices of missing and present points:
 
@@ -189,10 +191,14 @@ indices_of_missing_points = data.loc[data["missing_data"].isna()].index
 indices_of_present_points = data.loc[data["missing_data"].notna()].index
 
 # 2. interpolate missing values and store them in 
-# a new column in the dataframe:
+# a new column in the dataframe. We can either do this with
+# the numpy function np.interp:
 data.loc[indices_of_missing_points,"interpolated_data"]= np.interp(indices_of_missing_points, 
           data.loc[indices_of_present_points,"missing_data"].index, 
           data.loc[indices_of_present_points,"missing_data"])
+
+# the pandas approach is much easier to use and is simply:
+data["interpolated_data"] = data["missing_data"].interpolate()
 ```
 
 In this approach all we did was to draw straight lines between adjacent points. As you see, for the first point
@@ -207,14 +213,11 @@ Imagine for example that you have a timeseries where you measure temperature at 
 If one datapoint was missing, you would connect the two night time temperatures and interpolate the daytime
 temperature way off.
 
-A simple measure of how well our model performed is to look at the residual standard error. We calculate it
-as
+A simple measure of how well our model performed is to look at the root mean squared error.
 
-<div> $$ \sqrt{\frac{\sum_{i=1}^n (y[i] - y_predicted[i])^2}{df}} $$ </div>
+<div> $$ RMSE = \sqrt{\frac{\overline{(y[i] - ypred[i])^2}}} $$ </div>
 
-where y is the true value, y_predicted is the predicted y value, and df is the degrees of freedom. Df is the total
-number of observations used for the model fitting minus the number of model parameters. Since we have 11 total 
-data points of which 3 are missing and we have 2 model parameter we have 6 degrees of freedom.  
+where y is the true value and ypred is the predicted y value. 
 
 {% capture exercise %}
 
@@ -226,13 +229,13 @@ data points of which 3 are missing and we have 2 model parameter we have 6 degre
 <details><summary markdown="span">Solution!</summary>
 
 ```python
-def get_RSE(y_true, y_predicted, degrees_freedom):
-    RSE = np.sqrt(np.sum((y_true - y_predicted)**2) / degrees_freedom)
-    return RSE
+def get_RMSE(y_true, y_predicted):
+    RMSE = np.sqrt(np.mean((y_true - y_predicted)**2))
+    return RMSE
 
 y_true = data.loc[indices_of_missing_points, "full_data"]
 y_predicted = data.loc[indices_of_missing_points, "interpolated_data"]
-rse = get_RSE(y_true, y_predicted, degrees_freedom=6)
+RMSE = get_RMSE(y_true, y_predicted)
 ```
 </details>
 
@@ -441,7 +444,7 @@ we have observation data of our target variable to train the model on, we first 
 data. We can do that easily by dropping the rows, where these columns are na with "dropna()":
 
 ```python
-present_data = df_dwd.loc[:,["SWIN","rH","tair_2m_mean"]].dropna()
+df_dwd_noNA = df_dwd.loc[:,["SWIN","rH","tair_2m_mean"]].dropna()
 ```
 
 Now we want to split these into the data we use as predictors (y) and the data we want to 
@@ -449,8 +452,8 @@ predict (x, also called the "predictand"):
 
 ```python
 
-y = present_data.loc[:,["SWIN","rH"]]
-x = present_data.loc[:,["tair_2m_mean"]]
+y = df_dwd_noNA.loc[:,["SWIN","rH"]]
+x = df_dwd_noNA.loc[:,["tair_2m_mean"]]
 ```
 
 Finally one last very important step is that we need to split our available data into two parts:
@@ -518,8 +521,8 @@ interpolated_data = np.interp(
 regression_results(y_test, interpolated_data)
 
 #-------- 1-D linear model:
-y = present_data.loc[:,["tair_2m_mean"]].values.reshape(-1,1)
-x = present_data.index.values.reshape(-1,1)
+y = df_dwd_noNA.loc[:,["tair_2m_mean"]].values.reshape(-1,1)
+x = df_dwd_noNA.index.values.reshape(-1,1)
 
 from sklearn.model_selection import train_test_split 
 # creating train and test sets 
@@ -600,12 +603,12 @@ Lets try adding some more of our weather-data into the model and see whether it 
 # Lets add the other weather-data columns into the predictor data as well.
 # First we find the rows where all the predictors data and our observations
 # are present:
-present_data_rf = df_dwd.loc[:,["SWIN","rH", "pressure_air", "wind_speed", "precipitation", "tair_2m_mean"]].dropna()
+df_dwd_noNA = df_dwd.loc[:,["SWIN","rH", "pressure_air", "wind_speed", "precipitation", "tair_2m_mean"]].dropna()
 
 # Now we split them into the x-values (predictors) and the y-values
 # (predictand or target variable)
-x = present_data_rf.loc[:,["SWIN","rH", "pressure_air", "wind_speed", "precipitation"]]
-y = present_data_rf.loc[:,["tair_2m_mean"]]
+x = df_dwd_noNA.loc[:,["SWIN","rH", "pressure_air", "wind_speed", "precipitation"]]
+y = df_dwd_noNA.loc[:,["tair_2m_mean"]]
 
 # Now we go an split the data into training and testing data:
 X_train, X_test, y_train, y_test = train_test_split( 
@@ -625,26 +628,26 @@ Finally, we will do some tweaking on the random forest paramters. Parameters are
 options given to the model, that define how it is set up. Here for example n_estimators
 is one parameter we gave to the model so far.  
 Maybe we can make the model perform even a bit better by increasing that value.
-In order to do so, we better use daily data, because as we make the model bigger,
+In order to do so, we better use hourly data, because as we make the model bigger,
 the time it takes to fit the model gets substanitally larger.  
 Lets first aggregate the data like before:  
 
 ```python
 # mean for most data:
-present_data_daily = present_data.loc[:,["SWIN","rH", "pressure_air", "wind_speed","tair_2m_mean", "date_time"]].resample(rule="1d", on="date_time").mean().dropna()
+df_dwd_hourly_noNA = df_dwd_noNA.loc[:,["SWIN","rH", "pressure_air", "wind_speed","tair_2m_mean", "date_time"]].resample(rule="1h", on="date_time").mean().dropna()
 # sum for precipitation data:
-present_data_daily["precipitation"] = present_data.loc[:,["precipitation", "date_time"]].resample(rule="1d", on="date_time").sum().dropna()
+df_dwd_hourly_noNA["precipitation"] = df_dwd_noNA.loc[:,["precipitation", "date_time"]].resample(rule="1h", on="date_time").sum().dropna()
 ```
 
-Now we can run a new model on the daily data and e.g. set the n_estimators to 50.
+Now we can run a new model on the hourly data and e.g. set the n_estimators to 50.
 Play around with the parameter a bit and see how the performance changes:
 ```python
 
-x_daily = present_data_daily.loc[:,["SWIN","rH", "pressure_air", "wind_speed", "precipitation"]]
-y_daily = present_data_daily.loc[:,["tair_2m_mean"]]
+x_hourly = df_dwd_hourly_noNA.loc[:,["SWIN","rH", "pressure_air", "wind_speed", "precipitation"]]
+y_hourly = df_dwd_hourly_noNA.loc[:,["tair_2m_mean"]]
 
 X_train, X_test, y_train, y_test = train_test_split( 
-	x_daily, y_daily, test_size=0.3, random_state=101) 
+	x_hourly, y_hourly, test_size=0.3, random_state=101) 
 rf_model = RandomForestRegressor(random_state=42, n_estimators=50)
 rf_model.fit(X_train, y_train)
 rf_model.score(X_test, y_test)
@@ -656,7 +659,7 @@ regression_results(y_test, y_hat_rf)
 {% capture exercise %}
 
 <h3> Exercise </h3>
-<p >Practice makes perfect! For the daily data, see how the linear interpolation, 1D-linear model and 
+<p >Practice makes perfect! For the hourly data, see how the linear interpolation, 1D-linear model and 
 multiple linear models perform compared to the random forest regression.</p>
 
 {::options parse_block_html="true" /}
@@ -665,13 +668,15 @@ multiple linear models perform compared to the random forest regression.</p>
 
 ```python
 #------- preparation of  data:
-# mean for most data:
-present_data_daily = present_data.loc[:,["SWIN","rH", "pressure_air", "wind_speed","tair_2m_mean", "date_time"]].resample(rule="1d", on="date_time").mean().dropna()
-present_data_daily["precipitation"] = present_data.loc[:,["precipitation", "date_time"]].resample(rule="1d", on="date_time").sum().dropna()
-x_daily = present_data_daily.loc[:,["SWIN","rH", "pressure_air", "wind_speed", "precipitation"]]
-y_daily = present_data_daily.loc[:,["tair_2m_mean"]]
+# mean for most data aggregation:
+df_dwd_hourly_noNA = df_dwd_noNA.loc[:,["SWIN","rH", "pressure_air", "wind_speed","tair_2m_mean", "date_time"]].resample(rule="1h", on="date_time").mean().dropna()
+# sum for precipitation aggregation:
+df_dwd_hourly_noNA["precipitation"] = df_dwd_noNA.loc[:,["precipitation", "date_time"]].resample(rule="1h", on="date_time").sum().dropna()
+
+x_hourly = df_dwd_hourly_noNA.loc[:,["SWIN","rH", "pressure_air", "wind_speed", "precipitation"]]
+y_hourly = df_dwd_hourly_noNA.loc[:,["tair_2m_mean"]]
 X_train, X_test, y_train, y_test = train_test_split( 
-	x_daily, y_daily, test_size=0.3, random_state=101) 
+	x_hourly, y_hourly, test_size=0.3, random_state=101) 
 
 print("------- linear intrpolation:")
 y_train_sorted = y_train.sort_index()
@@ -706,33 +711,36 @@ regression_results(y_test, y_hat_rf)
   {{ exercise | markdownify }}
 </div>
 
-As you can see from the results above, even for daily data the linear interpolation still performs best.
+For hourly data the linear interpolation still performs best.
 However, the gaps we are interpolating thus far are rather small. As a last exercise, we will see how the methods
-perform for longer gaps. Therefore I create a gap in the daily dataset of 60 days. We will then see how
+perform for longer gaps. Therefore I create a gap in the hourly dataset of a full day. We will then see how
 the different methods perform in filling the gap:
 
 ```python
-present_data_daily = present_data.loc[:,["SWIN","rH", "pressure_air", "wind_speed","tair_2m_mean", "date_time"]].resample(rule="1d", on="date_time").mean().dropna()
-present_data_daily["precipitation"] = present_data.loc[:,["precipitation", "date_time"]].resample(rule="1d", on="date_time").sum().dropna()
+df_dwd_hourly_noNA = df_dwd_noNA.loc[:,["SWIN","rH", "pressure_air", "wind_speed","tair_2m_mean", "date_time"]].resample(rule="1h", on="date_time").mean().dropna()
+df_dwd_hourly_noNA["precipitation"] = df_dwd_noNA.loc[:,["precipitation", "date_time"]].resample(rule="1h", on="date_time").sum().dropna()
 
 # first lets create the 14-day long gap:
-indices_for_gap = present_data_daily.iloc[1000:1060, :].index
-gapped_data_daily = present_data_daily.copy()
-gapped_data_daily.loc[indices_for_gap, "tair_2m_mean"] = np.NaN
-x_daily = gapped_data_daily.loc[indices_for_gap,["SWIN","rH", "pressure_air", "wind_speed", "precipitation"]]
-
-y_true = present_data_daily.loc[indices_for_gap, "tair_2m_mean"]
+# I first extract the indices of some single day and safe them
+indices_for_gap = df_dwd_hourly_noNA.iloc[505:529, :].index
+# Now I make a copy of the original data to not mess it up
+gapped_data_hourly = df_dwd_hourly_noNA.copy()
+# Then I set all the values for tair in these indices to NaN
+gapped_data_hourly.loc[indices_for_gap, "tair_2m_mean"] = np.NaN
+# Finally I can extract the predictor and predictand columns with these indices:
+x_hourly = gapped_data_hourly.loc[indices_for_gap,["SWIN","rH", "pressure_air", "wind_speed", "precipitation"]]
+y_true = df_dwd_hourly_noNA.loc[indices_for_gap, "tair_2m_mean"]
 
 #---- interpolation
-interpolated_data = gapped_data_daily["tair_2m_mean"].interpolate()
+interpolated_data = gapped_data_hourly["tair_2m_mean"].interpolate()
 regression_results(y_true, interpolated_data[indices_for_gap])
 
 #---- multiple linear regression:
-y_hat_linear = linearModel.predict(x_daily)
+y_hat_linear = linearModel.predict(x_hourly)
 regression_results(y_true, y_hat_linear)
 
 #---- Random Forest:
-y_hat_rf = rf_model.predict(x_daily)
+y_hat_rf = rf_model.predict(x_hourly)
 regression_results(y_true, y_hat_rf)
 
 ```
@@ -759,16 +767,9 @@ will quickly get worse in its prediction.
 <div class="notice--primary">
   {{ exercise | markdownify }}
 </div>
-
-
-
-
-As you can see, random forest easily outperformed the other two approaches. As long as there is 
-a clear linear trend in the data, a simple interpolation might perform very well. However, if 
+As long as there is a clear linear trend in the data, a simple interpolation might perform very well. However, if 
 within a data gap a shift happens and for example a warm period comes around, the linear interpolation 
 can not capture that. 
-
-
 
 Keep in mind that a model is by definition NEVER the actual truth. Its goal is to come as close as possible to the truth
 while often times drastically reducing the complexity of the issue. In a real world scenario we would not
