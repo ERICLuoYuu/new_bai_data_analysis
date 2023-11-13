@@ -222,7 +222,7 @@ where y is the true value and ypred is the predicted y value.
 {% capture exercise %}
 
 <h3> Exercise </h3>
-<p >Use your knowledge of pandas and numpy to write a function that returns the RSE</p>
+<p >Use your knowledge of pandas and numpy to write a function that returns the RMSE</p>
 
 {::options parse_block_html="true" /}
 
