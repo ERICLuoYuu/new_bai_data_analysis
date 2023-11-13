@@ -215,7 +215,7 @@ temperature way off.
 
 A simple measure of how well our model performed is to look at the root mean squared error.
 
-<div> $$ RMSE = \sqrt{\frac{\overline{(y[i] - ypred[i])^2}}} $$ </div>
+<div> $$ RMSE = \sqrt{\overline{(y[i] - ypred[i])^2}} $$ </div>
 
 where y is the true value and ypred is the predicted y value. 
 
