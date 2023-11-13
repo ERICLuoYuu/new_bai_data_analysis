@@ -459,6 +459,9 @@ the model. To test the performance of the model, we keep a fraction of the avail
 of the training set. That way we can predict the testing data and compare it to the real results.
 We are working with some artificiallly created gaps in the data here, but in real life you would 
 otherwise have no way to test, how well your model actually predicts data.  
+Additionally to splitting the data, the training datasets also get shuffled. That makes the 
+model more robust in extrapolating it to unknown data.  
+
 It is extremely important to do this split, because you can never test a model on data that it 
 has already seen during its training phase. That would skew your results and make it look better than
 it actually is.  
@@ -501,13 +504,18 @@ Do any of them perform equally good or better than the multiple regression? </p>
 
 ```python
 #------- interpolation:
+# in order to interpolate value-by-value we need to
+# first sort the previously randomized data:
+
+y_train_sorted = y_train.sort_index()
+y_test_sorted = y_test.sort_index()
+
 interpolated_data = np.interp(
-    y_test.index,
-    y_train.index,
-    y_train["tair_2m_mean"])
+    y_test_sorted.index,
+    y_train_sorted.index,
+    y_train_sorted["tair_2m_mean"])
 
 regression_results(y_test, interpolated_data)
-
 
 #-------- 1-D linear model:
 y = present_data.loc[:,["tair_2m_mean"]].values.reshape(-1,1)
@@ -538,6 +546,7 @@ regression_results(y_test, y_hat)
 We already covered quite a lot of ground on how to deal with missing data by
 - cleaning the raw data
 - gap fill with interpolation, 1D-linear modeling and multiple linear regression
+
 In this final part we will take a quick look at a more sophisticated type of model, the
 Random Forests algorithm. Random Forest is a so-called decision-tree algorithm
 and can be counted to the broad category of "machine-learning" methods.
@@ -589,37 +598,177 @@ final decision.
 Lets try adding some more of our weather-data into the model and see whether it improves the performance:
 ```python
 # Lets add the other weather-data columns into the predictor data as well.
+# First we find the rows where all the predictors data and our observations
+# are present:
 present_data_rf = df_dwd.loc[:,["SWIN","rH", "pressure_air", "wind_speed", "precipitation", "tair_2m_mean"]].dropna()
 
+# Now we split them into the x-values (predictors) and the y-values
+# (predictand or target variable)
 x = present_data_rf.loc[:,["SWIN","rH", "pressure_air", "wind_speed", "precipitation"]]
 y = present_data_rf.loc[:,["tair_2m_mean"]]
 
+# Now we go an split the data into training and testing data:
 X_train, X_test, y_train, y_test = train_test_split( 
 	x, y, test_size=0.3, random_state=101) 
 
+# Finally we do the full pipeline of 
+# creating the model, fitting it, and scoring:
 rf_model = RandomForestRegressor(random_state=42, n_estimators=12)
 rf_model.fit(X_train, y_train)
 rf_model.score(X_test, y_test)
 y_hat_rf = rf_model.predict(X_test)
 regression_results(y_test, y_hat_rf)
-# Aha, the model performs quite a bit better.
+# Aha, the model performs a bit better.
 ```
-To visually compare the errors in the predictions, we can plot the misfit between
-predicted and modeled data in a scatter plot:
+
+Finally, we will do some tweaking on the random forest paramters. Parameters are 
+options given to the model, that define how it is set up. Here for example n_estimators
+is one parameter we gave to the model so far.  
+Maybe we can make the model perform even a bit better by increasing that value.
+In order to do so, we better use daily data, because as we make the model bigger,
+the time it takes to fit the model gets substanitally larger.  
+Lets first aggregate the data like before:  
 
 ```python
-errors_rf = y_test - y_hat_rf
-errors_linear = y_test - y_hat_linear
-errors_ml = y_test - y_hat_ml
-
+# mean for most data:
+present_data_daily = present_data.loc[:,["SWIN","rH", "pressure_air", "wind_speed","tair_2m_mean", "date_time"]].resample(rule="1d", on="date_time").mean().dropna()
+# sum for precipitation data:
+present_data_daily["precipitation"] = present_data.loc[:,["precipitation", "date_time"]].resample(rule="1d", on="date_time").sum().dropna()
 ```
 
+Now we can run a new model on the daily data and e.g. set the n_estimators to 50.
+Play around with the parameter a bit and see how the performance changes:
+```python
+
+x_daily = present_data_daily.loc[:,["SWIN","rH", "pressure_air", "wind_speed", "precipitation"]]
+y_daily = present_data_daily.loc[:,["tair_2m_mean"]]
+
+X_train, X_test, y_train, y_test = train_test_split( 
+	x_daily, y_daily, test_size=0.3, random_state=101) 
+rf_model = RandomForestRegressor(random_state=42, n_estimators=50)
+rf_model.fit(X_train, y_train)
+rf_model.score(X_test, y_test)
+y_hat_rf = rf_model.predict(X_test)
+regression_results(y_test, y_hat_rf)
+# as you can see, the model performs yet another bit better.
 ```
 
-As you can see, the R^2 of our gap filled data is not very high. We used the model to predict a gap of data that
-is a lot smaller than the validation dataset. It seems that, even though the model did a pretty good job 
-predicting the trend of the data on longer timescales, when we look at shorter periods the represented variance decreases
-drastically.
+{% capture exercise %}
+
+<h3> Exercise </h3>
+<p >Practice makes perfect! For the daily data, see how the linear interpolation, 1D-linear model and 
+multiple linear models perform compared to the random forest regression.</p>
+
+{::options parse_block_html="true" /}
+
+<details><summary markdown="span">Solution!</summary>
+
+```python
+#------- preparation of  data:
+# mean for most data:
+present_data_daily = present_data.loc[:,["SWIN","rH", "pressure_air", "wind_speed","tair_2m_mean", "date_time"]].resample(rule="1d", on="date_time").mean().dropna()
+present_data_daily["precipitation"] = present_data.loc[:,["precipitation", "date_time"]].resample(rule="1d", on="date_time").sum().dropna()
+x_daily = present_data_daily.loc[:,["SWIN","rH", "pressure_air", "wind_speed", "precipitation"]]
+y_daily = present_data_daily.loc[:,["tair_2m_mean"]]
+X_train, X_test, y_train, y_test = train_test_split( 
+	x_daily, y_daily, test_size=0.3, random_state=101) 
+
+print("------- linear intrpolation:")
+y_train_sorted = y_train.sort_index()
+y_test_sorted = y_test.sort_index()
+interpolated_data = np.interp(
+    y_test_sorted.index,
+    y_train_sorted.index,
+    y_train_sorted["tair_2m_mean"])
+regression_results(y_test_sorted, interpolated_data)
+
+print("------- multiple linear regression:")
+linearModel = LinearRegression()
+linearModel.fit(X_train,y_train)
+y_hat = linearModel.predict(X_test)
+errors = (y_test - y_hat).iloc[:,0].values
+regression_results(y_test, y_hat)
+
+print("------- random forest:")
+rf_model = RandomForestRegressor(random_state=42, n_estimators=50)
+rf_model.fit(X_train, y_train.values.ravel())
+rf_model.score(X_test, y_test)
+y_hat_rf = rf_model.predict(X_test)
+regression_results(y_test, y_hat_rf)
+```
+</details>
+
+{::options parse_block_html="false" /}
+
+{% endcapture %}
+
+<div class="notice--primary">
+  {{ exercise | markdownify }}
+</div>
+
+As you can see from the results above, even for daily data the linear interpolation still performs best.
+However, the gaps we are interpolating thus far are rather small. As a last exercise, we will see how the methods
+perform for longer gaps. Therefore I create a gap in the daily dataset of 60 days. We will then see how
+the different methods perform in filling the gap:
+
+```python
+present_data_daily = present_data.loc[:,["SWIN","rH", "pressure_air", "wind_speed","tair_2m_mean", "date_time"]].resample(rule="1d", on="date_time").mean().dropna()
+present_data_daily["precipitation"] = present_data.loc[:,["precipitation", "date_time"]].resample(rule="1d", on="date_time").sum().dropna()
+
+# first lets create the 14-day long gap:
+indices_for_gap = present_data_daily.iloc[1000:1060, :].index
+gapped_data_daily = present_data_daily.copy()
+gapped_data_daily.loc[indices_for_gap, "tair_2m_mean"] = np.NaN
+x_daily = gapped_data_daily.loc[indices_for_gap,["SWIN","rH", "pressure_air", "wind_speed", "precipitation"]]
+
+y_true = present_data_daily.loc[indices_for_gap, "tair_2m_mean"]
+
+#---- interpolation
+interpolated_data = gapped_data_daily["tair_2m_mean"].interpolate()
+regression_results(y_true, interpolated_data[indices_for_gap])
+
+#---- multiple linear regression:
+y_hat_linear = linearModel.predict(x_daily)
+regression_results(y_true, y_hat_linear)
+
+#---- Random Forest:
+y_hat_rf = rf_model.predict(x_daily)
+regression_results(y_true, y_hat_rf)
+
+```
+{% capture exercise %}
+
+<h3> Exercise </h3>
+<p >Play around with the length of the gap and observe how the performance of the different methods changes.
+Try to give an explanation and maybe formulate, when something like linear interpolation could be suitable and 
+when it is better to rely on a more complex method.</p>
+
+{::options parse_block_html="true" /}
+
+<details><summary markdown="span">Solution!</summary>
+The Random Forest method works quite nicely on longer prediction windows. As long as there is 
+a clear linear trend in the data, a simple interpolation might perform very well. However, if 
+within a data gap a shift happens and for example a warm period comes around, the linear interpolation 
+will quickly get worse in its prediction.
+</details>
+
+{::options parse_block_html="false" /}
+
+{% endcapture %}
+
+<div class="notice--primary">
+  {{ exercise | markdownify }}
+</div>
+
+
+
+
+As you can see, random forest easily outperformed the other two approaches. As long as there is 
+a clear linear trend in the data, a simple interpolation might perform very well. However, if 
+within a data gap a shift happens and for example a warm period comes around, the linear interpolation 
+can not capture that. 
+
+
 
 Keep in mind that a model is by definition NEVER the actual truth. Its goal is to come as close as possible to the truth
 while often times drastically reducing the complexity of the issue. In a real world scenario we would not
