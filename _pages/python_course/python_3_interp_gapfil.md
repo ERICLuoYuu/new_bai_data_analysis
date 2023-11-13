@@ -17,7 +17,7 @@ we first need to handle.
 
 ### 1. Loading and  converting data:
 We will use some data I have prepared in a way that you might find it in an online data portal.  
-[Download the file here](/assets/data/dwd_diepholz_1996_2023_missing_placeholders.parquet)
+[Download the file here](assets/data/dwd_diepholz_1996_2023_missing_placeholders.parquet)
 
 To test some things we will work with the air temperature column "tair_2m_mean" here.
 There are several issues when we have a missing-data-placeholder like that. Try two things:
@@ -483,8 +483,8 @@ linearModel.score(X_test,y_test)
 # You can plot the prediction for the testing period
 # as a scatter plot to get an idea of the spread
 # of the errors. Put true values on one axis and predicted on the other:
-yhat = linearModel.predict(X_test).reshape(1,-1)[0]
-px.scatter(x=yhat,y=y_test["tair_2m_mean"]).show()
+y_hat_ml = linearModel.predict(X_test).reshape(1,-1)[0]
+px.scatter(x=y_hat_ml,y=y_test["tair_2m_mean"]).show()
 ```
 As you can see the score is roughly 0.36. That is not exactly great but does indicate
 a weak correlation between predicted and true values. 
@@ -520,7 +520,7 @@ X_train, X_test, y_train, y_test = train_test_split(
 
 linearModel = LinearRegression()
 linearModel.fit(X_train,y_train)
-y_hat = linearModel.predict(X_test)
+y_hat_linear = linearModel.predict(X_test)
 regression_results(y_test, y_hat)
 ```
 </details>
@@ -594,79 +594,26 @@ present_data_rf = df_dwd.loc[:,["SWIN","rH", "pressure_air", "wind_speed", "prec
 x = present_data_rf.loc[:,["SWIN","rH", "pressure_air", "wind_speed", "precipitation"]]
 y = present_data_rf.loc[:,["tair_2m_mean"]]
 
+X_train, X_test, y_train, y_test = train_test_split( 
+	x, y, test_size=0.3, random_state=101) 
+
 rf_model = RandomForestRegressor(random_state=42, n_estimators=12)
 rf_model.fit(X_train, y_train)
 rf_model.score(X_test, y_test)
 y_hat_rf = rf_model.predict(X_test)
 regression_results(y_test, y_hat_rf)
-# Aha the model performs quite a bit better.
+# Aha, the model performs quite a bit better.
+```
+To visually compare the errors in the predictions, we can plot the misfit between
+predicted and modeled data in a scatter plot:
+
+```python
+errors_rf = y_test - y_hat_rf
+errors_linear = y_test - y_hat_linear
+errors_ml = y_test - y_hat_ml
+
 ```
 
-
-We will create a Random Forest model with mtry = 6. The mtry keyword defines, how many predictors will be considered
-in each model. The argument ntree = 500 means that we will create a total number of 500 models, each containing
-a different combination of predictors and data.
-```R
-rfmodel <- randomForest(T ~ ., data = TrainSet, importance = TRUE, replace=FALSE, mtry=6, ntree=500, type="regression")
-rfmodel
-```
-
-
-
-Similar to how we used the predict() method before for the linear models, we can use it here on our random forest
-model. We feed it the model and our validation dataset to test the model performance on unknown data:
-```R
-predValid <- predict(rfmodel, ValidSet)
-```
-
-
-
-Lets take a look at how the model output looks compared to the actual data:
-```R
-plot(ValidSet$$T, xlab="Day", ylab="T [°C]")
-points(predValid, pch=19, col="red")
-legend(110,26, legend=c("true data", "modelled data"), col=c("black", "red"), pch=c(1,19))
-```
-
-
-
-Now we calculate some metrics to evaluate our model performance: 
-```R
-metrics = data.frame(
-    "RMSE" = sqrt(mean((ValidSet$$T - predValid)^2)),
-    "R^2" = cor(ValidSet$$T, predValid)^2
-    )
-metrics
-```
-
-Our R^2 of more than roughly 0.78 is quite satisfying, considering that we are dealing with daily averaged data in a meteorological context.
-A reasonable amount (78%) of the data variance is represented by our model.
-The root mean square error of 2.9 is not too bad, but does indicate that specific absolute values are not
-exactly predicted by the model.
-
-Finally we can use our model to predict the missing data in our original dataframe:
-```R
-predgap <- predict(rfmodel, data_site_daily_reduced[removed_indices,])
-```
-
-To compare our results, we can plot the reduced data, the true valus and our model output together:
-```R
-plot(data_site_daily_reduced$$T, xlab="Day", cex=0.85, ylab="T [°C]")
-points(removed_indices,predgap, pch=19, cex=0.85, col="red")
-
-#points(removed_indices,data_site_daily$$T[removed_indices], cex=0.85, pch=19, col="black")
-#legend(1,25, legend=c("gap data", "modelled data", "true data"), col=c("black", "red", "black"), pch=c(1,19, 19))
-legend(1,25, legend=c("gap data", "modelled data"), col=c("black", "red"), pch=c(1,19))
-```
-
-Also look at the plot above with the true data plotted (remove the commenting sign in the cell above).
-Now we calculate some metrics to evaluate our model performance: 
-```R
-metrics = data.frame(
-    "RMSE" = sqrt(mean((data_site_daily$$T[removed_indices] - predgap)^2, na.rm=TRUE)),
-    "R^2" = cor(data_site_daily$$T[removed_indices], predgap,  use="complete.obs")^2
-    )
-metrics
 ```
 
 As you can see, the R^2 of our gap filled data is not very high. We used the model to predict a gap of data that
