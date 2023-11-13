@@ -535,86 +535,73 @@ regression_results(y_test, y_hat)
 
 
 ### 2.4: Machine Learning approaches (example Random Forests)
-Here we will just take a quick look at a machine learning method which is commonly used for gap filling applications,
-Random Forests.
-The purpose is that you get an idea of how to implement such a method and at least you have seen it. We will not go
+We already covered quite a lot of ground on how to deal with missing data by
+- cleaning the raw data
+- gap fill with interpolation, 1D-linear modeling and multiple linear regression
+In this final part we will take a quick look at a more sophisticated type of model, the
+Random Forests algorithm. Random Forest is a so-called decision-tree algorithm
+and can be counted to the broad category of "machine-learning" methods.
+The latter however is reeeeally a broad category, as it basically just describes that
+the machine works through a minimization procedure on such a large amount of data, that
+humans could not handle it manually, thus the machine is "learning" the optimization of
+the model and can make predictions from it.  
+
+Random Forests has proven to be quite effective in gap-filling applications in a 
+variety of contexts and is available as part of the scikit-learn package. 
+The purpose is for you to get an idea, how to implement such a sophisticated method 
+and to hopefully get you excited about machine learning! We will not go
 into the details of the actual method.
 
+Lets dive right in and load the random forest regressor from scikit-learn. We use the regressor
+because we work with time-series data. Random Forest also has a classification model, which is used
+for categorical data (for example image-recognition, predicting an animal type from its traits etc...)
 
+The great thing about scikit-learn is that most of the models work in the exact same way, no 
+matter whether it is a simple linear model or a complex machine-learning approach.  
+For example to run a model with simple default setting all we have to do is the following:  
 
-First we need an extra library for this regression:
-```R
-install.packages("randomForest") # <-- You can comment this line out once you installed the package
-library(randomForest)
+```python
+from sklearn.ensemble import RandomForestRegressor
+  # I set n_estimators to 12 for a quick initial fit
+  # we will go into the parameters a bit more later!
+rf_model = RandomForestRegressor(random_state=42, n_estimators=12)
+rf_model.fit(X_train, y_train)
+rf_model.score(X_test, y_test)
+y_hat_rf = rf_model.predict(X_test)
+regression_results(y_test, y_hat_rf)
 ```
-
-When applying machine learning or generally models to actual applications, what you have to do is split your data
-into two independent sets. One you will use to construct your model on, this is the so called "training" dataset.
-The second dataset will be used to test your constructed model on and see how well it performs on data it has 
-never seen before. This split is extremely important to maintain, because otherwise you might get an overestimation
-of your model performance and your claims can easily be disproved.  
-In the previous examples we omitted this procedure because we knew the missing data and could evaluate our model
-performance on it, in real life however we do not have the missing data and need to act like a part of the present
-datapoints are missing.
-
-
-
-From the reduced dataset we remove the rows containing NAN, which is the data we actually do not have.
-```R
-data_site_daily_reduced_noNA = data_site_daily_reduced[complete.cases(data_site_daily_reduced),] # Remove rows containing NA
-```
-Additionally the columns containing datetime, line, DP and ST are removed because they are no good predictors or 
-are derived from temperature. In the case of surface temperature, we will just act like we don't have it to make
-the prediction more interesting.
-```R
-data_site_daily_reduced_noNA = data_site_daily_reduced_noNA[3:18] # Removing line and ST
-data_site_daily_reduced_noNA = data_site_daily_reduced_noNA[,-14] # Removing ST
-data_site_daily_reduced_noNA = data_site_daily_reduced_noNA[,-5] # Removing DP
-```
-
-Now we will split the remaining dataset into two sets comprising of 70% of the date for training and 30% for testing
-We will not use a consecutive sample of the data (e.g. the first x%) but rather a random sample. This is because
-consecutive data often time contains a correlation in itself which can lead to biased models. No further details here,
-just keep in mind that when training models randomizing the input is an important point (keyword "autocorrelation")
-
-For  this we can use the sample() function. We pass it all available indices of our dataset with "nrow(dataset)". As
-input you can use either a vector of values or an integer. If it is an integer like we used here, it is the values 
-1 to the integer, so 1 to nrow(data_site_daily_reduced_noNA).
-Then we specifiy that we want our sample to be 70% of that data with 0.7*nrow(data_site_daily_reduced_noNA).
-With replace = False we specify that we want to remove the indices after sampling them, so we can not pick
-an index twice in our sample.
-```R
-train <- sample(nrow(data_site_daily_reduced_noNA), 0.7*nrow(data_site_daily_reduced_noNA), replace = FALSE)
-```
-
-
-Now we use the sample of indices above to create our training and testing datasets. 
-First we use the indices directly to pick the values from the original dataset into our TrainSet
-```R
-TrainSet <- data_site_daily_reduced_noNA[train,]
-```
-
-Then we use the same indices to create our validation dataset, by picking those indices from the original dataset
-which are NOT in the train indices array by putting a minus in front of it. That is "exclusive" indexing.
-```R
-ValidSet <- data_site_daily_reduced_noNA[-train,]
-nrow(TrainSet)
-nrow(ValidSet)
-```
-
+The predicting performance is still not that great. However, with a machine-learning approach we can feed 
+some more data into the model and see, whether it improves the model.  
 I will only give a very brief intro to random forests here, no need to memorize that. If you are interested,
 you can also look the below youtube video for a very good short video on the method.  
-https://www.youtube.com/watch?v=v6VJ2RO66Ag
-  
+https://www.youtube.com/watch?v=v6VJ2RO66Ag  
+   
 Very generally speaking you can say that this algorithm looks at your data and the predictors and it picks
-a few of  the predictors, leaving others out.
+a few of  the predictors, leaving others out.  
 With this reduced set it trains a model. That means, it tries to find out under which circumstances in the 
-predictors, the data has a certain value. 
+predictors, the data has a certain value.   
 In random forests, many of those models are trained and compared. Each with different predictors and trained on 
-different amounts and points of training data.
+different amounts and points of training data.  
 After building the model, you can use it to predict unknown values. Therefore, the predictor data for these 
 unknown datapoints is fed into each of these models and the combined output from all of them is evaluated as the
 final decision.
+
+Lets try adding some more of our weather-data into the model and see whether it improves the performance:
+```python
+# Lets add the other weather-data columns into the predictor data as well.
+present_data_rf = df_dwd.loc[:,["SWIN","rH", "pressure_air", "wind_speed", "precipitation", "tair_2m_mean"]].dropna()
+
+x = present_data_rf.loc[:,["SWIN","rH", "pressure_air", "wind_speed", "precipitation"]]
+y = present_data_rf.loc[:,["tair_2m_mean"]]
+
+rf_model = RandomForestRegressor(random_state=42, n_estimators=12)
+rf_model.fit(X_train, y_train)
+rf_model.score(X_test, y_test)
+y_hat_rf = rf_model.predict(X_test)
+regression_results(y_test, y_hat_rf)
+# Aha the model performs quite a bit better.
+```
+
 
 We will create a Random Forest model with mtry = 6. The mtry keyword defines, how many predictors will be considered
 in each model. The argument ntree = 500 means that we will create a total number of 500 models, each containing
