@@ -446,16 +446,15 @@ we have observation data of our target variable to train the model on, we first 
 data. We can do that easily by dropping the rows, where these columns are na with "dropna()":
 
 ```python
-df_dwd_noNA = df_dwd.loc[:,["SWIN","rH","tair_2m_mean"]].dropna()
+df_dwd_noNA = df_dwd.loc[:,["date_time","SWIN","rH","tair_2m_mean"]].dropna()
 ```
 
 Now we want to split these into the data we use as predictors (y) and the data we want to 
 predict (x, also called the "predictand"):
 
 ```python
-
-y = df_dwd_noNA.loc[:,["SWIN","rH"]]
-x = df_dwd_noNA.loc[:,["tair_2m_mean"]]
+x = df_dwd_noNA.loc[:,["SWIN","rH"]]
+y = df_dwd_noNA.loc[:,["tair_2m_mean"]]
 ```
 
 Finally one last very important step is that we need to split our available data into two parts:
@@ -605,7 +604,7 @@ Lets try adding some more of our weather-data into the model and see whether it 
 # Lets add the other weather-data columns into the predictor data as well.
 # First we find the rows where all the predictors data and our observations
 # are present:
-df_dwd_noNA = df_dwd.loc[:,["SWIN","rH", "pressure_air", "wind_speed", "precipitation", "tair_2m_mean"]].dropna()
+df_dwd_noNA = df_dwd.loc[:,["date_time", "SWIN","rH", "pressure_air", "wind_speed", "precipitation", "tair_2m_mean"]].dropna()
 
 # Now we split them into the x-values (predictors) and the y-values
 # (predictand or target variable)
