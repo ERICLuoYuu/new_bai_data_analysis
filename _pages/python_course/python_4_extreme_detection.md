@@ -23,6 +23,14 @@ We will once again use the DWD dataset from the Diepholz station for this sectio
 [Diepholz DWD meteo data (25mb)...](assets/data/dwd_diepholz_1996_2023.parquet).  
 [Literatur](/assets/r_ex4/wmo-td_1500_en.pdf)  
 
+We will have to do some plotting again, so it might be good for you to resample the data to hourly data again, just to reduce the size
+of the dataset a bit. By now you should know how to do it. Try to create a pandas Series with hourly air temperature data.  
+If you are getting stuck, you can refer to the exercise before.
+```python
+df_dwd_ta_hourly = ...
+```
+
+
 ### 2. Background
 We will look at three different methods to determine extreme events from time series of meteorological data. The main difference between the methods is the way they define the reference, to which we compare a value to describe it as being "extreme" or not.  
 Pause for a second and think about how you could describe what an extreme value is.  
@@ -40,149 +48,137 @@ However, we might also be interested in the months with extreme temperatures. Be
 Read More: Extreme value return periods
 </summary>
 Another approach is the evaluation of extreme values and their probabilities based on historical data. Relating these probabilities to the time series of the data produces "return periods", frequencies in which the extreme values are expected to occur. As an example, requirements for buildings often include a resistance to weather extremes with a certain return period. Making up a case, wind turbines would be built that they can withstand windspeeds with a "return level" in a "return period" of 1 in 10.000, meaning the chance that such a windspeed occurs in a year would be 0.01%.
-In meteorological data 
 </details>
 
 ### 3. Methods and Implementation
-Lets now look at three different methods to analyze extreme events in our sample dataset. We will talk about the reasoning and the R implementation of the methods. The first section is a general introduction to the code. We will then go through each method. In the beginning of each chapter you can find the code for the specific method. This way you can always quickly refer to the context.
+Lets now look at three different methods to analyze extreme events in our sample dataset. We will talk about the reasoning and the implementations of the methods. 
+We will then go through each method and implement the methods into functions, which you can then use to analyze your data.
 
-In the code you have downloaded is a method called "Extreme_detection" which takes the arguments X, timecol, prob and method. 
-```R
-Extreme_detection = function(X,timecol,prob,method) 
+We will start by defining a so called "wrapper-function". This will be a function we can pass our data to and define the method, we want to use for extreme detection.
+The function will then call another "sub-function" for us, which actually does the extreme detection. So the arguments that this wrapper function needs are the actual data, a quantile argument and and an argument defining the method we want to use.
+
+What are quantiles?  
+  
+A quantile is a subset of the given data, that contains a certain percentage of the distribution of the data. E.g. in the following figure, everything left of the red line is in the q10 percentile, the lowest 10% of the data. Everything up to the blue line is in the q90, the quantity that comprises of 90% of the data.
+![Quantiles](.\misc\2023\01\05\quantiles.png)
+You can use the following function to visualize the quantiles of our dataset:
+```python
+
+def visualize_quantiles(x:pd.Series, q_low:float, q_high:float):
+    import scipy.stats as stats
+    x_mean = x.mean()
+    x_sd = x.std()
+    y = stats.norm.pdf(x.sort_values(), x_mean, x_sd) # This function creates the y-values of the normal distribution given our data, the mean and the standard deviation
+    qh = x.quantile(q_high) # here we calculate the higher quantile threshold
+    ql = x.quantile(q_low) # here we calculate the lower quantile threshold 
+    fig = px.scatter(x=x.sort_values(),y=y)
+    fig.add_trace(
+        go.Scatter(
+            x=[ql, ql],
+            y = [0,max(y)],
+            mode="lines",
+            name=f"{q_low*100}% quantile"
+        )
+    )
+    fig.add_trace(
+        go.Scatter(
+            x=[qh, qh],
+            y = [0,max(y)],
+            mode="lines",
+            name=f"{q_high*100}% quantile"
+        )
+    )
+    fig.show()
+
+get_quantiles(df_dwd_ta_hourly, 0.05, 0.95)
+```
+Back to our extreme_detection function:  
+
+The return type will be a pandas dataframe. Overall the function definition will look somewhat like this:
+```python
+def extreme_detection(X:pd.Series,quantile:float,method:str) -> pd.DataFrame:
+  IMPLEMENTED_METHODS = ["POT", "BM", "MA"]
+  if method not in IMPLEMENTED_METHODS:
+    raise Exception(f"Method {method} not implement. Use one of {IMPLEMENTED_METHODS}")
+  if method = "...":
+    ...
+  elif method = "...":
+    ...
+  elif method = "...":
+    ...
+  return ...
 ```
 The arguments for this functions are the following:
 - **X** is the series of data which is to analyzed for extremes
-- **timecol** is the column of data in which the time is stored 
-- **prob** defines the extreme threshold in terms of percentiles of the data given as integers, e.g. 80, 90, 95. E.g. passing in 90 will define everything above a range of values that includes 90% and below a range that includes the lowest 10% as extreme high/low values.
-  <details>
-
-  <summary>
-  Read more: What are quantiles?
-  </summary>
-
-  A quantile is a subset of the given data, that contains a certain percentage of the distribution of the data. E.g. in the following figure, everything left of the red line is in the q10 percentile, the lowest 10% of the data. Everything up to the blue line is in the q90, the quantity that comprises of 90% of the data.
-  ![A test image](.\misc\2023\01\05\quantiles.png)
-  You can paste the following function in your code after you loaded the data and play around with the visualization of the quantiles:
-  ```R
-  Quantiles = function(x, q_low, q_high){
-    x_mean = mean(x)
-    x_sd = sd(x)
-    y = dnorm(x, T1997_mean, T1997_sd) # This function creates the y-values of the normal distribution given our data, the mean and the standard deviation
-    qh = quantile(x,q_high*0.01) # here we calculate the higher quantile threshold
-    ql = quantile(x,q_low*0.01) # here we calculate the lower quantile threshold 
-
-    above_qh = TairData$Tair_f[TairData$Tair_f > qh] # filter the datapoints from our set which are above qh
-    below_ql = TairData$Tair_f[TairData$Tair_f < ql] # filter the datapoints from our set which are below ql
-    print(paste("Percentage of values below q",q_low,": ",sep = ""))
-    print(length(above_q90) / length(TairData$Tair_f) * 100)
-    print(paste("Percentage of values above q",q_high,": ",sep = ""))
-    print(length(below_q10) / length(TairData$Tair_f) * 100)
-
-    plot(x,y)
-    lines(c(ql,ql), c(0,1), col="red", lwd=4)
-    lines(c(qh,qh), c(0,1), col="blue", lwd=4)
-    legend("topleft", legend=c(paste("Q",q_low,sep = ""), paste("Q",q_high,sep = "")), col=c("red","blue"), lty=1, lwd=4)
-    }
-
-  Quantiles(TairData$Tair_f,10,90)
-  ```
-  </details>
+- **quantile** defines the extreme threshold in terms of percentiles of the data given as floats, e.g. 0.8, 0.9. E.g. passing in 90 will define everything above a range of values that includes 90% and below a range that includes the lowest 10% as extreme high/low values.
 - **method** defines which extreme detection will be used
   - "POT" for Point Over Threshold
   - "BM" for Block Maxima 
   - "MA" for Moving Average.
 
-The structure of the method is rather simple. Depending in the given method argument, one of three blocks of code will be executed. The branching is done with if-conditionals:
-```R
-Extreme_detection = function(X,timecol,prob, method) 
-{
-  if(method == 'POT')
-  {
-    ...RUNS POT CODE
-  }
-  
-  if(method == 'BM')
-  {
-    ...RUNS BM CODE
-  }
-  
-  if(method == 'MA')
-  {
-    ...RUNS MA CODE
-  }
-  
-  if(!method %in% c('POT','BM','MA'))
-  {
-    print('Error: enter the method for extreme detection')
-  }
-}
-```
-If an invalid method is chosen, the last block is executed simply printing an Error-message.
+The structure of the method is pretty simple:  
+First we check whether the method that as given is actually an implemented one. By convention, variable names for constants are written in all-capslock. So we have a list of implemented methods, and if the provided method is not in that list, we throw an error at the user that tells him/her, that this is not a valid input. 
+Depending on the given method argument, one of three blocks of code will be executed. The branching is simply done with if-conditionals.
 
-Below the function definition the example dataset is loaded and you are given some example calls to the function:
-```R
-#1. Examples----------------------
-load('Tair_TS_CH-Dav_1997_2018.RData')  # load the timeseries data provided with the script
-summary(TairData)
-
-## Extreme at 95th percentile using POT method---
-Tair_extreme_POT = Extreme_detection(TairData$Tair_f, TairData$Date, 95, 'POT')
-
-## Extreme at 95th percentile using BM method---
-Tair_extreme_BM = Extreme_detection(TairData$Tair_f, TairData$Date, 95, 'BM')
-
-## Extreme at 95th percentile using MA method---
-Tair_extreme_MA = Extreme_detection(TairData$Tair_f, TairData$Date, 95, 'MA')
-```
-Finally, in the very end of the file you find a number of additional functions which will be used in the exercises. 
 #### 3.1 Peak Over Threshold (POT)
 
-Peak over threshold codeblock:  
+The first approach is the Point Over Threshold (POT) method. This is a very simple approach that looks at the whole dataset as one.  
+We define fixed thresholds for the dataset, defining the upper and lower bounds above or below which values will be considered extreme.  
+The boundaries are usually defined by the quantiles we provided as an argument to the function.
 
-```R  
+{% capture exercise %}
 
-  if(method == 'POT')
-  {
-    sprintf('Extremes detection using peak over threshold method at: %f percentile',prob)
-    DF = data.frame(Value = X, Date = timecol)
-    DF = DF %>% 
-      mutate(Extreme = if_else(Value > quantile(Value, probs = prob*0.01, na.rm = TRUE), 'Extreme-high',
-                               if_else(Value < quantile(Value, probs = (1- prob*0.01), na.rm = TRUE), 'Extreme-low', 'Not-Extreme')))  ## selecting values higher and lower than the percentile
-    
-    p = DF %>% 
-      ggplot(., aes(x = Date, y = Value)) + 
-      geom_point(aes(color = Extreme)) + 
-      geom_line(size = 0.4) + theme_bw()
-    print(p)
-    return(DF)
-  }
-```  
-  
-The first approach is the Point Over Threshold (POT) method. We define fixed thresholds for the dataset, defining the upper and lower bounds above or below which values will be considered extreme. The boundaries are defined by the quantiles we provided as an argument to the function.
+<h3> Exercise </h3>
+<p >Lets try and code that method ourselves. It is actually not very difficult! <br>
+Define a new function called "peak_over_threshold()". <br> 
+It needs to take a series of data as input and the quantile we want to use for extreme detection. <br>
+Then we need to do the following operations: <br>
+<ol>
+  <li>Find the upper and lower thresholds for what is to be defined as extreme, absed on the quantiles. To find these values you can use the handy Python function "quantiles()". Just call it on the input Series and provide the quantiles as argument as in "X.quantiles(0.95)". Remember: You want the upper **and lower** thresholds. Think about how you can get both.
+Then create a dataframe to return with two new columns: One called
+  <li> Find those rows in the input series which are higher and lower than the upper and lower thresholds. You can get Series of booleans by comparing a pandas Series with a value. You can try it out, just type for example "X > 270" if X is your Series.
+  <li> Finally you want to create a dataframe, because of course you want to return the results of your extreme value detection. Create a dataframe with the input data and two new columns, one containing the booleans of your high extreme values and the other for the low extremes.
+</ol>
+A little hint: The description here is quite long but the code for this is actually quite short.
 
-So what is happening in the code? 
+{::options parse_block_html="true" /}
+
+<details><summary markdown="span">Hint if you get stuck!</summary>
+You can generate a Series of boolean values that indicate whether a datapoint is above or below a value with a direct comparison such as 
+```python
+    X_larger_than_280 = X > 280
+```
+</details>
+
+
+<details><summary markdown="span">Solution!</summary>
+
+```python
+
+def peak_over_threshold(X:pd.Series, prob):
+
+    print(f'Extremes detection using peak over threshold method at: {prob} percentile')
+    df = pd.DataFrame(index=X.index, data = {
+        "data": X,
+        "extreme_low":  X < X.quantile(q=1-prob),
+        "extreme_high":  X > X.quantile(q=prob)
+    })
+    return df
+```
+</details>
+
+{::options parse_block_html="false" /}
+
+{% endcapture %}
+
+<div class="notice--primary">
+  {{ exercise | markdownify }}
+</div>
+
 
 Very simple: First we create a new Dataframe with our data and the respective dates.  This dataframe is fed into a pipeline where we "mutate" the dataframe. In the mutation, a new column is added called "Extreme". This column is then populated through a conditional function, the if_else() function from the dplyr package. Here the code gets a bit complicated, because there is a second if_else() inside the first if_else() function. It is a "nested" function.  It works like this:  
 Normally the if_else() function checks a condition and for all values passed and returns one of two values, depending on whether the condition is true or false. Consider this:
-```R
-x = c(-5,-2,2) # x now is a vector [-5,-2,2]
-if_else(x > 0, "positive", "negative") # Returns "positive" when provided value > 0, else returns "negative"
-Output:
-negative
-negative
-positive
-```
-So now when we have a nested if_else() function the "inner" function gets executed when the first condition returns false:
-```R
-x = c(-5,-2,0,2) # x now is a vector [-5,-2,0,2]
-if_else(x > 0, "positive", # When the number is bigger than 0, function returns "positive", else second if_else() is executed
-  if_else(x == 0, "null","negative")) # When the number is equal 0 returns "null", else returns "negative"
-Output:
-negative
-negative
-null
-positive
-```
+
 In our POT-codeblock we first examine if the datapoint is bigger than the upper quantile threshold. If so, it sets the value in the "Extrem" column to "Extreme-high". If not, the second if_else block checks whether the value is lower thant the lower quantile boundary. If so, it sets the value of the "Extreme" column to "Extreme-low", else to "Not-Extreme".
 
 Go ahead and run the example for the POT method:
