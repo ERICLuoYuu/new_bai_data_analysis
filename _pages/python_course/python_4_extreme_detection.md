@@ -31,7 +31,7 @@ There are several ways to think about extreme values. An extreme value can simpl
   
 In meteorological time series we are often interested in a range of extreme values. In other words, we are interested in the values in the tails of the distribution of our sample data, which exceed a certain threshold. It is important to consider the distribution of our underlying dataset and the question we actually want to answer. 
 
-Our example dataset comprises of air temperature data from 1997 to 2020. If we are interested in the extreme values with respect to this whole time period, we can simply look at the distribution of all the data, determine a threshold and see which datapoints are above the upper or below the lower threshold. 
+Our example dataset comprises of air temperature data from 1996 to 2023. If we are interested in the extreme values with respect to this whole time period, we can simply look at the distribution of all the data, determine a threshold and see which datapoints are above the upper or below the lower threshold. 
 
 However, we might also be interested in the months with extreme temperatures. Because our distribution includes winter and summer data, extreme temperatures in spring and autumn will probably not be considered in this approach. For these we would have to create data distributions of seasonal, monthly or even daily data to evaluate extreme events on the respective time scale. This will become more obvious when we look at the methods.
 

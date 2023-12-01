@@ -25,5 +25,5 @@ python:
     url: python_2_data_and_data_viusalization
   - title: "3. Interpolation and Gap Filling"
     url: python_3_interp_gapfill
-  # - title: "4. Extreme Value Detection"
-  #   url: python_4_extremes
+  - title: "4. Extreme Value Detection"
+    url: python_4_extreme_detection
