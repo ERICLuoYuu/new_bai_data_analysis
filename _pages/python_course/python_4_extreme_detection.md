@@ -90,7 +90,7 @@ get_quantiles(df_dwd_ta_hourly, 0.05, 0.95)
 
 Alright, now that we layed out the basics, lets dive into theme methods!  
 
-![Congrats Meme](assets/images/python/4/extreme_meme.png)  
+![extreme Meme](assets/images/python/4/extreme_meme.png)  
 
 #### 3.1 Peak Over Threshold (POT)
 
