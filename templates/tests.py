@@ -1,5 +1,6 @@
 import pandas as pd
 import numpy as np
+from scipy import stats
 from sklearn import metrics
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.linear_model import LinearRegression
@@ -108,7 +109,7 @@ df_dwd["date_time"] = pd.to_datetime(df_dwd["date_time"])
 df_dwd = df_dwd.set_index("date_time")
 indices_of_missing_values = df_dwd.loc[df_dwd["tair_2m_mean"] == -999.99, "tair_2m_mean"].index
 df_dwd.loc[indices_of_missing_values, "tair_2m_mean"] = np.NaN
-df_dwd_ta_hourly = df_dwd["tair_2m_mean"].resample("1h").mean()
+df_dwd_ta_daily = df_dwd["tair_2m_mean"].resample("1d").mean()
 
 
 def visualize_quantiles(x:pd.Series, q_low:float, q_high:float):
@@ -137,17 +138,18 @@ def visualize_quantiles(x:pd.Series, q_low:float, q_high:float):
     )
     fig.show()
 
-visualize_quantiles(df_dwd.tair_2m_mean, 0.05, 0.95)
+# visualize_quantiles(df_dwd_ta_daily, 0.05, 0.95)
 
-def peak_over_threshold(X:pd.Series, prob):
-
-    print(f'Extremes detection using peak over threshold method at: {prob} percentile')
+def find_extremes_by_peak_over_threshold(X:pd.Series, prob):
+    print("----")
+    print("Finding extremes: peak-over-threshold method")    
     df = pd.DataFrame(index=X.index, data = {
         "data": X,
         "extreme_low":  X < X.quantile(q=1-prob),
         "extreme_high":  X > X.quantile(q=prob)
     })
     plot_extremes(df, "extreme_high", "extreme_low")  
+    return df
   
   
 def plot_extremes(data:pd.DataFrame, extr_high_col:str, extr_low_col:str):
@@ -161,7 +163,8 @@ def plot_extremes(data:pd.DataFrame, extr_high_col:str, extr_low_col:str):
             y=data["data"],
             mode="markers",
             name="no extreme",
-            marker_color="black"
+            marker_color="black",
+            marker_size=5,
             )
     ),
     fig.add_traces(
@@ -170,10 +173,8 @@ def plot_extremes(data:pd.DataFrame, extr_high_col:str, extr_low_col:str):
             y = extr_high_data,
             name="extr. high",
             mode="markers",
-            marker=dict(
-                color='red',
-                size=5,
-            ),
+            marker_color='orange',
+            marker_size=5,
             showlegend=True
         )
     )
@@ -183,13 +184,95 @@ def plot_extremes(data:pd.DataFrame, extr_high_col:str, extr_low_col:str):
             y = extr_low_data,
             name="extr. low",
             mode="markers",
-            marker=dict(
-                color='LightSkyBlue',
-                size=5
-            ),
+            marker_color='LightSkyBlue',
+            marker_size=5,
             showlegend=True
         )
     )
+    fig.update_layout(
+        template="simple_white"
+    )
     fig.show()
     
-peak_over_threshold(df_dwd_ta_hourly, 0.95)
+# extremes_df = peak_over_threshold(df_dwd_ta_daily, 0.95)
+
+def find_extremes_by_block_maxima(X:pd.Series, prob:float):
+    print("----")
+    print("Finding extremes: block maxima method")
+    df_bm = pd.DataFrame(index=X.index, data={
+        "doy":X.index.day_of_year,
+        "data":X.values,
+        "data_14d_ma": X.rolling(window=14, min_periods=1, center=True).mean()
+    })
+    long_term_means = df_bm.groupby("doy")["data"].mean()
+
+    df_bm["diff"] = np.zeros(len(X))
+    for row, index in df_bm.iterrows():
+        ltm = long_term_means[long_term_means.index == df_bm.loc[row,"doy"]]
+        diff = df_bm.loc[row,"data"] - ltm
+        df_bm.loc[row, "diff"] = diff.values
+    
+    upper_thresh = df_bm["diff"].quantile(prob)
+    lower_thresh = df_bm["diff"].quantile(1-prob)
+    df_bm["extreme_high"] = df_bm["diff"] > upper_thresh
+    df_bm["extreme_low"] = df_bm["diff"] < lower_thresh
+    return df_bm
+
+def find_extremes_by_moving_average(X:pd.Series, prob:float):
+    print("----")
+    print("Finding extremes: block maxima method")
+    df_ma = pd.DataFrame(index=X.index, data={
+        "data":X.values,
+        "data_14d_ma": X.rolling(window=14, min_periods=1, center=True).mean()
+    })
+
+    df_ma["diff"] = df_ma["data"] - df_ma["data_14d_ma"]
+    
+    upper_thresh = df_ma["diff"].quantile(prob)
+    lower_thresh = df_ma["diff"].quantile(1-prob)
+    df_ma["extreme_high"] = df_ma["diff"] > upper_thresh
+    df_ma["extreme_low"] = df_ma["diff"] < lower_thresh
+    return df_ma
+
+
+def plot_extremes_distribution(dfs:list[pd.DataFrame], extr_high_col:str, extr_low_col:str, methods:list[str]):
+    print("----")
+    print("Printing extremes")
+    colors = ["red", "blue", "green", "purple", "lightblue", "coral"]
+    
+    fig = go.Figure()
+    for i,df in enumerate(dfs):
+        method = methods[i]
+        color = colors[i]
+        
+        extr_highs = df.loc[df[extr_high_col] == True, "data"]
+        extr_lows = df.loc[df[extr_low_col] == True, "data"]
+        y_high = stats.norm.pdf(extr_highs.sort_values(), extr_highs.mean(), extr_highs.std()) # This function creates the y-values of the normal distribution given our data, the mean and the standard deviation
+        y_low = stats.norm.pdf(extr_lows.sort_values(), extr_lows.mean(), extr_lows.std()) # This function creates the y-values of the normal distribution given our data, the mean and the standard deviation
+        fig.add_traces(
+            go.Scatter(
+                x=extr_highs.sort_values(),
+                y=y_high,
+                name = f"{method} extreme highs",
+                mode = "lines",
+                line_color = color
+                )
+        )
+        fig.add_traces(
+            go.Scatter(
+                x=extr_lows.sort_values(),
+                y=y_low,
+                name=f" {method} extreme lows",
+                mode = "lines",
+                line_color = color,
+                line_dash = "dash"
+                )
+        )
+    fig.update_layout(template="simple_white")
+    fig.show()
+
+df_bm = find_extremes_by_block_maxima(df_dwd_ta_daily, 0.95)
+df_pot = find_extremes_by_peak_over_threshold(df_dwd_ta_daily, 0.95)
+df_ma = find_extremes_by_moving_average(df_dwd_ta_daily, 0.95)
+plot_extremes_distribution([df_pot, df_bm, df_ma], "extreme_high", "extreme_low", ["POT", "BM", "MA"])
+print()

@@ -23,13 +23,10 @@ We will once again use the DWD dataset from the Diepholz station for this sectio
 [Diepholz DWD meteo data (25mb)...](assets/data/dwd_diepholz_1996_2023.parquet).  
 [Literatur](/assets/r_ex4/wmo-td_1500_en.pdf)  
 
-We will have to do some plotting again, so it might be good for you to resample the data to hourly data again, just to reduce the size
-of the dataset a bit. By now you should know how to do it. Try to create a pandas Series with hourly air temperature data.  
+We will have to do some plotting again, so it might be good for you to resample the data to daily data, just to reduce the size
+of the dataset a bit.
+By now you should know how to do it. Try to create a pandas Series with hourly air temperature data.  
 If you are getting stuck, you can refer to the exercise before.
-```python
-df_dwd_ta_hourly = ...
-```
-
 
 ### 2. Background
 We will look at three different methods to determine extreme events from time series of meteorological data. The main difference between the methods is the way they define the reference, to which we compare a value to describe it as being "extreme" or not.  
@@ -54,9 +51,7 @@ Another approach is the evaluation of extreme values and their probabilities bas
 Lets now look at three different methods to analyze extreme events in our sample dataset. We will talk about the reasoning and the implementations of the methods. 
 We will then go through each method and implement the methods into functions, which you can then use to analyze your data.
 
-We will start by defining a so called "wrapper-function". This will be a function we can pass our data to and define the method, we want to use for extreme detection.
-The function will then call another "sub-function" for us, which actually does the extreme detection. So the arguments that this wrapper function needs are the actual data, a quantile argument and and an argument defining the method we want to use.
-
+As a little preface we need to talk about a concept we will use for all methods: Quantiles.  
 What are quantiles?  
   
 A quantile is a subset of the given data, that contains a certain percentage of the distribution of the data. E.g. in the following figure, everything left of the red line is in the q10 percentile, the lowest 10% of the data. Everything up to the blue line is in the q90, the quantity that comprises of 90% of the data.
@@ -92,33 +87,10 @@ def visualize_quantiles(x:pd.Series, q_low:float, q_high:float):
 
 get_quantiles(df_dwd_ta_hourly, 0.05, 0.95)
 ```
-Back to our extreme_detection function:  
 
-The return type will be a pandas dataframe. Overall the function definition will look somewhat like this:
-```python
-def extreme_detection(X:pd.Series,quantile:float,method:str) -> pd.DataFrame:
-  IMPLEMENTED_METHODS = ["POT", "BM", "MA"]
-  if method not in IMPLEMENTED_METHODS:
-    raise Exception(f"Method {method} not implement. Use one of {IMPLEMENTED_METHODS}")
-  if method = "...":
-    ...
-  elif method = "...":
-    ...
-  elif method = "...":
-    ...
-  return ...
-```
-The arguments for this functions are the following:
-- **X** is the series of data which is to analyzed for extremes
-- **quantile** defines the extreme threshold in terms of percentiles of the data given as floats, e.g. 0.8, 0.9. E.g. passing in 90 will define everything above a range of values that includes 90% and below a range that includes the lowest 10% as extreme high/low values.
-- **method** defines which extreme detection will be used
-  - "POT" for Point Over Threshold
-  - "BM" for Block Maxima 
-  - "MA" for Moving Average.
+Alright, now that we layed out the basics, lets dive into theme methods!  
 
-The structure of the method is pretty simple:  
-First we check whether the method that as given is actually an implemented one. By convention, variable names for constants are written in all-capslock. So we have a list of implemented methods, and if the provided method is not in that list, we throw an error at the user that tells him/her, that this is not a valid input. 
-Depending on the given method argument, one of three blocks of code will be executed. The branching is simply done with if-conditionals.
+![Congrats Meme](assets/images/python/4/extreme_meme.png)  
 
 #### 3.1 Peak Over Threshold (POT)
 
@@ -175,153 +147,250 @@ def peak_over_threshold(X:pd.Series, prob):
   {{ exercise | markdownify }}
 </div>
 
+For this and the next methods it will be very handy to have a function that plots the data and the extreme highs and lows in separate colors. You can try to build a nice plotly figure yourself or you use the code I provide below.
 
-Very simple: First we create a new Dataframe with our data and the respective dates.  This dataframe is fed into a pipeline where we "mutate" the dataframe. In the mutation, a new column is added called "Extreme". This column is then populated through a conditional function, the if_else() function from the dplyr package. Here the code gets a bit complicated, because there is a second if_else() inside the first if_else() function. It is a "nested" function.  It works like this:  
-Normally the if_else() function checks a condition and for all values passed and returns one of two values, depending on whether the condition is true or false. Consider this:
+{::options parse_block_html="true" /}
 
-In our POT-codeblock we first examine if the datapoint is bigger than the upper quantile threshold. If so, it sets the value in the "Extrem" column to "Extreme-high". If not, the second if_else block checks whether the value is lower thant the lower quantile boundary. If so, it sets the value of the "Extreme" column to "Extreme-low", else to "Not-Extreme".
+<details><summary markdown="span">Plot function</summary>
 
-Go ahead and run the example for the POT method:
-```R
-## Extreme at 95th percentile using POT method---
-Tair_extreme_POT = Extreme_detection(TairData$Tair_f, TairData$Date, 95, 'POT')
+```python
+
+def plot_extremes(data:pd.DataFrame, extr_high_col:str, extr_low_col:str):
+    extr_high_data = data.loc[data[extr_high_col]==True, "data"]
+    extr_low_data = data.loc[data[extr_low_col]==True, "data"]
+    
+    fig = go.Figure()
+    fig.add_traces(    
+        go.Scatter(
+            x=data.index, 
+            y=data["data"],
+            mode="markers",
+            name="no extreme",
+            marker_color="black",
+            marker_size=5,
+            )
+    ),
+    fig.add_traces(
+        go.Scatter(
+            x = extr_high_data.index,
+            y = extr_high_data,
+            name="extr. high",
+            mode="markers",
+            marker_color='orange',
+            marker_size=5,
+            showlegend=True
+        )
+    )
+    fig.add_traces(
+        go.Scatter(
+            x = extr_low_data.index,
+            y = extr_low_data,
+            name="extr. low",
+            mode="markers",
+            marker_color='LightSkyBlue',
+            marker_size=5,
+            showlegend=True
+        )
+    )
+    fig.update_layout(
+        template="simple_white"
+    )
+    fig.show()
+    
 ```
-You will get a plot of the data with marked extreme low and high values (see spoiler below) as well as a dataframe that contains the "Extreme" column along with the original data.
+</details>
 
-Output Figure:  
-![POT image](/assets/r_ex4/extreme_POT.png)
-*Figure 1: Extreme values based on the whole dataset POT method*
-  
-As expected you can see that this plot gives us information about the extreme values with respect to the whole timeline. 
+{::options parse_block_html="false" /}
 
----------
-#### Exercise
+Take a look at the output and the datapoints marked as extreme values. 
+Evaluate the plot yourself. What is the reference for these extreme values? 
+Which questions could you answer with this type of extreme detection, which not?  
 
-1. Lets fiddle with the code for a bit. Change the **prob** parameter to 85, 75 and see how the output changes. How many extreme values do you expect when setting prob to 50? Think about it and then run the function with that quantile.
-2. In the additional methods at the end of the script you can find a function called ``` Extremes_per_year()```. Run it with your output from the POT extreme detection with different quantiles as argument and evaluate the output. What do the trend lines indicate? 
-Extra: If you want you can evaluate the trend lines by fiddeling with the function code. Remember the lesson about linear models and the "summary()" method. How would you describe the usefulness of the linear model fitted to this data?
-3. You can visualize the thresholds that define extreme values using the ```Quantiles()``` function which is given in the additional functions. Run it with the output of your extreme detection function for a few different prob arguments. Note that you have to pass the lower and upper quantiles to the ```Quantile()``` function, e.g. for 95 % you call it as ```Quantiles(dataframe, 5, 95)```. Look at the different plots, what do you think would be an appropriate threshold?
+
+<h3> Exercise </h3>
+<p>Lets fiddle with the code for a bit. Change the **prob** parameter to 85, 75 and see how the output changes. How many extreme values do you expect when setting prob to 50? Think about it and then run the function with that quantile. <br>
+
+{% endcapture %}
+
+<div class="notice--primary">
+  {{ exercise | markdownify }}
+</div>
+
 
 ----------
 
 #### 3.2. Block Maxima Method (BM)
-Block maxima codeblock:  
-```R
-  if(method == 'BM')
-  {
-    sprintf('Extremes detection using block maxima at %f percentile',prob)
-    DF = data.frame(Value = X, Date = timecol) %>% mutate(DOY = as.numeric(format(Date,'%j'))) # calculating DOY for long-term mean, calculate month if working on monthly data.
-    
-    DF = DF %>% mutate(Var_15ma = lead(c(rep(NA, 15 - 1),zoo::rollmean(Value,15, align = 'center')),7)) %>%   ## 15-day moving average and then long-term mean
-      group_by(DOY) %>% 
-      mutate(Var_LTm = mean(boot(Var_15ma,meanFunc,100)$t, na.rm = TRUE))  %>%   ## Var_LTm is the long-term mean based on a 15-day moving average-
-      mutate(del_Var = Value - Var_LTm) %>%       ## deviation from a long-term mean
-      mutate(Extreme = if_else(del_Var > quantile(del_Var, probs = prob*0.01, na.rm = TRUE), 'Extreme-high',
-                               if_else(del_Var < quantile(del_Var, probs = (1-prob*0.01), na.rm = TRUE), 'Extreme-low', 'Not-Extreme')))  ## Assigning extreme classes based on del_Var
-    
-    p = DF %>% 
-      ggplot(., aes(x = Date)) + 
-      geom_point(aes(y = Value, fill = Extreme), color = 'black', stroke = 0, shape = 21) + 
-      geom_line(aes(y = Value, color = 'Value'), size = 0.4) + 
-      theme_bw() +
-      geom_line(aes(y = Var_LTm, color = 'Long-term mean'), size = 0.8) + 
-      scale_color_manual('', values = c('black','grey50'))
-    
-    print(p)
-    
-    return(DF)
-  }
-  ```  
 
-The next method we are looking at is the "Block Maxima" method. As the name states, we are looking at a certain "block" of data and find the maxima based on the defined threshold of the values in this block. There are several ways we could define these reference blocks. For example we could look at every year individually and find the extreme values for these. We would get an array of the hottest and coldest days of each year separately.
-If we where more interested in extreme values across years, we could for example define a block as data from each season across the years. So the block "spring" would consist of data from 01.03. to 31.05. across all the years in the dataset. We could then find extremes based on the quantiles of the seasonally data and separate e.g. extreme values in spring and autumn from the overshadowing extreme values in winter and summer.
+The next method we are looking at is the "Block Maxima" method. As the name states, we are looking at a certain "block" of data and find the maxima based on the defined threshold of the values in this block. There are several ways we could define these reference blocks. For example we could look at every year individually and find the extreme values for these. Alternatively, we could create blocks from each week of the year across all years or for every month across all years. We could then find extremes based on the quantiles of the data for every wekk of the year and separate e.g. extreme values in spring and autumn from the overshadowing extreme values in winter and summer.
 
-In our example code the blocks are defined as the values for each single day across all the years. The procedure is as follows: 
+In our example we will define the blocks as the values for each single day across all the years. The procedure is as follows: 
 
 **Step 1**  
-In the first line we again create a dataframe with the data, a date column and then add a new column called "DOY" with a mutation, that gives each date a value of 1 to 365. We can later use these values to calculate a mean for each year across the seasons:  
-```R
- DF = data.frame(Value = X, Date = timecol) %>% mutate(DOY = as.numeric(format(Date,'%j'))) # calculating DOY 
- ```
+In the first line we again create a dataframe with the data, a date column and then add a new column called "DOY" with a mutation, that gives each date a value of 1 to 365. We need this "day" value to group our data across the years by it. We can get this by grabbing the "day_of_year" property from our datetime-indices in Pandas.
+
+```python
+df_bm = pd.DataFrame(index=X.index, data={
+        "doy":X.index.day_of_year,
+        "data":X.values,
+    })
+```
 
 **Step 2**  
-Next a second mutation is being done, which creates the column "Var_15ma". This is the 15 day moving average around every day. Moving average means that the "window" of data we are calculating the mean from varies. For each data point  
-```R
- DF = DF %>% mutate(Var_15ma = lead(c(rep(NA, 15 - 1),zoo::rollmean(Value,15, align = 'center')),7)) # 15-day moving average and then long-term mean 
- ```  
+Next we create the column "data_14d_ma". This is the 15 day moving average around every day. Moving average means that the "window" of data we are calculating the mean from varies.
+
+```python
+df_bm["data_14d_ma"] = X.rolling(window=14, min_periods=1, center=True)
+```  
+
 Through this, we accquire a smoothing of the daily temperature values and make the underlying dataset for our daily temperature distribution more broad. The reasoning is the following:  
 We want to create a representative dataset for daily temperature values across the years. If we use the single day for each year, we have a dataset of 18 datapoints which can easily include heavy outliers. By using a moving average of 15 days we enhance our dataset for each day by a factor of 15 to 270 datapoints, still restricted to a pretty small time window. While it does reduce the impact of individual extremely hot or cold days, it is more likely to representatively capture the state of the atmosphere around the time of interest.  
   
 **Step 3**  
-The next step creates the column "Var_LTm". This is the column representing the long-term mean (LTm) for each day of the year:  
-```R 
-mutate(Var_LTm = mean(boot(Var_15ma,meanFunc,100)$t, na.rm = TRUE))  %>%   ## Var_LTm is the long-term mean based on a 15-day moving average-
+Now that we have the smoothed data and our doy information we can go ahead and calculate the long-term mean for every day of the year. To do so, we use the pandas "groupby" function. This allows us to sample data based on common values in a column. E.g. for the day of the year, it will grab all values where the day of the year is 1 and calculate the mean for those, then for day 2 and so on.  
+
+```python
+long_term_means = df_bm.groupby("doy")["data"].mean()
 ```  
-This is a bit of a nested function call because we use a method called "bootstrapping". Bootstrapping means that we take several random subsamples from the data we have and calculate the mean for each subsample. Then we can look at the distribution of these means e.g. to find confidence intervals. This allows us to asses how representative our mean value for the whole dateset is. Finally, we can calcualte the mean of the means of the subsamples and use that as our final mean value. The function looks like this:  
-```R
-mean(boot(Var_15ma,meanFunc,100)$t, na.rm = TRUE))
+Now that we have those long term means, we can calculate the difference between every datapoint and the long-term mean that fits to its day of the year. To make it more clear, we can use the pandas "iterrows" function that allows us to loop through the rows of the dataframe.
+First we create a new column filled with zeros called "diff". Then we go through the rows of the dataframe, grab that long-term mean value by its index that corresponds to the "doy" of the current row (done with long_term_means.index == df_bm.loc[row,"doy"]). Then we subtract that long-term mean from that corresponding datapoint.
+```python
+df_bm["diff"] = np.zeros(len(X))
+for row, index in df_bm.iterrows():
+    ltm = long_term_means[long_term_means.index == df_bm.loc[row,"doy"]]
+    diff = df_bm.loc[row,"data"] - ltm
+    df_bm.loc[row, "diff"] = diff.values
 ```  
-The order in which these functions are executed is form the inside out: first the function ```boot()``` is called with the parameters Var_15ma, meanFunc and 100. This means we take 100 subsamples from the column Var_15ma and call the function ```meanFunc()``` on them. This is just a function that calculates the mean of a vector. With the $t after the function call we access the resulting vector of 100 means which is returend from the boot() function. Then we simply calculate the mean from these means and ingore the NA-values with ``` mean(..., na.rm = TRUE)```.  
-  
+
 **Step 4**  
-Finally we calculate the deviation of each datapoint from the previously derived mean and create a new column called "del_Var". Now these deviations from the mean are split into quantiles and del_vars which are above or below the threshold are defined as extreme:  
-  
-```R
-mutate(del_Var = Value - Var_LTm) %>%       ## deviation from a long-term mean
-mutate(Extreme = if_else(del_Var > quantile(del_Var, probs = prob*0.01, na.rm = TRUE), 'Extreme-high',
-                          if_else(del_Var < quantile(del_Var, probs = (1-prob*0.01), na.rm = TRUE), 'Extreme-low', 'Not-Extreme')))  ## Assigning extreme classes based on del_Var
-    
+One thing is still missing: the threshold to define our datapoint as extreme! In this approach we define the thresholds for something to be extreme based on the "diff" column. We want to find those values, where the deviation from the long-term mean for that specific day of the year is larger than usual. Makes sense right? Again we can use the quantiles function to find the extremes of the differences:
+
+```python
+upper_thresh = df_bm["diff"].quantile(prob)
+lower_thresh = df_bm["diff"].quantile(1-prob)
+df_bm["extreme_high"] = df_bm["diff"] > upper_thresh, "data"
+df_bm["extreme_low"] = df_bm["diff"] < lower_thresh, "data"
 ```  
+
 Note: In the POT approach the quantiles where built from the whole dataset itself. Here, the quantiles are built from the array of deviations from the mean! Remember this in the exercise when you evaluate the results.
 
----
-### Exercises
+{% capture exercise %}
 
-1. After using POT and the BM method with daily blocks, which method do you expect to yield more extreme values per year? Think about it and then use the ```Extremes_per_year()``` function to check your hypothesis. You can also print a table of the number of high and low extremes using the given function ```Total_Extremes()``` which also takes a dataframe as an argument.
-2. The Extreme_Detection() function has one parameter called "rollmean_period" which has a default value of 15. This means that the time window on which the mean for each day is calculated is 15 days, the day + the 7 days before and after. Think about how it might affect the outcomes if you set this value to 1 or to 365. To evaluate, you can use the extra functions given in the end of the script, ```Plot_Extremes()``` and ```Quantile()```. Remember what the quantiles where built from (so which column you have to pass to the ```Quantile()``` function). You can use the ```Plot_Extremes()``` function to plot the extreme values of a specific year e.g. for 2017 like this:  
-```R
-Plot_Extremes(Tair_extreme_MA %>% filter(Date > '2017-01-01' & Date < '2018-01-01'))
+<h3> Exercise </h3>
+
+1. Go ahead and built a function for the block maxima method. You already got all the building blocks. Put them together and add the right function definition and return statement.  
+2. After using POT and the BM, which method do you expect to yield more extreme values per year? How do you think the extremes of the two methods are different from each other?  
+3. To compare the outcomes of the two functions you can plot the distributions of the extreme values together. In the "visualize_quantiles" method above you already have a function given that creates a distribution. Write a new function that builds distributions of the extreme values for the different methods and creates a plot. This can well be done by first creating an empty figure object and then looping through the different extremes-dataframes, calculating the distributions for each and adding a new trace. After the loop you can call the "fig.show()" to display the figure. A starter code is given below.
+
+{::options parse_block_html="true" /}
+
+<details><summary markdown="span">Starter Code ex. 3</summary>
+
+```python
+def visualize_extreme_distributions(dfs:list[pd.DataFrame], extr_high_col:str, extr_low_col:str, methods:list[str]):
+    print("----")
+    print("Printing extremes")
+    colors = ["red", "blue", "green", "purple", "lightblue", "coral"]
+    
+    fig = go.Figure()
+    for i,df in enumerate(dfs):
+        method = methods[i]
+        color = colors[i]
+        #... calculate distributions and add new traces to  the figure
+        # You can nicely visualize the different methods by giving them the 
+        # same color but maybe differentiate low and high
+        # extremes by using dashed and solid lines
+        # Use the "method" variable to give the traces
+        # labels (with the "name" parameter to tell them apart
+        # in the legend)
 ```
+</details>
+
+<details><summary markdown="span">Solution Ex. 1</summary>
+
+```python
+# the full code for the block maxima method
+def block_maxima(X:pd.Series, prob:float):
+    df_bm = pd.DataFrame(index=X.index, data={
+        "doy":X.index.day_of_year,
+        "data":X.values,
+        "data_14d_ma": X.rolling(window=14, min_periods=1, center=True).mean()
+    })
+    long_term_means = df_bm.groupby("doy")["data"].mean()
+
+    df_bm["diff"] = np.zeros(len(X))
+    for row, index in df_bm.iterrows():
+        ltm = long_term_means[long_term_means.index == df_bm.loc[row,"doy"]]
+        diff = df_bm.loc[row,"data"] - ltm
+        df_bm.loc[row, "diff"] = diff.values
+    
+    upper_thresh = df_bm["diff"].quantile(prob)
+    lower_thresh = df_bm["diff"].quantile(1-prob)
+    df_bm["extreme_high"] = df_bm["diff"] > upper_thresh, "data"
+    df_bm["extreme_low"] = df_bm["diff"] < lower_thresh, "data"
+    return df_bm
+
+```
+</details>
+
+<details><summary markdown="span">Solution Ex. 3</summary>
+
+```python
+def plot_extremes_distribution(dfs:list[pd.DataFrame], extr_high_col:str, extr_low_col:str, methods:list[str]):
+    print("----")
+    print("Plotting extreme distributions")
+    colors = ["red", "blue", "green", "purple", "lightblue", "coral"]
+    
+    fig = go.Figure()
+    for i,df in enumerate(dfs):
+        method = methods[i]
+        color = colors[i]
+        
+        extr_highs = df.loc[df[extr_high_col] == True, "data"]
+        extr_lows = df.loc[df[extr_low_col] == True, "data"]
+        y_high = stats.norm.pdf(extr_highs.sort_values(), extr_highs.mean(), extr_highs.std()) # This function creates the y-values of the normal distribution given our data, the mean and the standard deviation
+        y_low = stats.norm.pdf(extr_lows.sort_values(), extr_lows.mean(), extr_lows.std()) # This function creates the y-values of the normal distribution given our data, the mean and the standard deviation
+        fig.add_traces(
+            go.Scatter(
+                x=extr_highs.sort_values(),
+                y=y_high,
+                name = f"{method} extreme highs",
+                mode = "lines",
+                line_color = color
+                )
+        )
+        fig.add_traces(
+            go.Scatter(
+                x=extr_lows.sort_values(),
+                y=y_low,
+                name=f" {method} extreme lows",
+                mode = "lines",
+                line_color = color,
+                line_dash = "dash"
+                )
+        )
+    fig.update_layout(template="simple_white") # <- not neccessary, I just like it!>
+    fig.show()
+```
+{::options parse_block_html="false" /}
+
+{% endcapture %}
+
+<div class="notice--primary">
+  {{ exercise | markdownify }}
+</div>
 
 ---
 
 #### 3.3. Moving Average Method (MA)
-Moving average codeblock:  
-```R
-  if(method == 'MA')
-  {
-    sprintf('Extremes detection using "moving average" at %f percentile',prob)
-    DF = data.frame(Value = X, Date = timecol) %>% mutate(DOY = as.numeric(format(Date,'%j'))) # calculating DOY for the long-term mean, calculate month if working on monthly data.
-    
-    DF = DF %>% 
-      arrange(Date) %>%  
-      mutate(Var_15ma = lead(c(rep(NA, 15 - 1),zoo::rollmean(Value,15, align = 'center')),7)) %>%   ## 15-day moving average 
-      mutate(del_Var = Value - Var_15ma) %>%       ## deviation from a 15-day moving average (change the days as per requirement)
-      mutate(Extreme = if_else(del_Var > quantile(del_Var, probs = prob*0.01, na.rm = TRUE), 'Extreme-high',
-                               if_else(del_Var < quantile(del_Var, probs = (1-prob*0.01), na.rm = TRUE), 'Extreme-low', 'Not-Extreme')))  ## Assigning extreme classes based on del_Var
-    
-    p = DF %>% 
-      ggplot(., aes(x = Date)) + 
-      geom_point(aes(y = Value, fill = Extreme), color = 'black', stroke = 0, shape = 21) + 
-      geom_line(aes(y = Value, color = 'Value'), size = 0.4) + 
-      theme_bw() +
-      geom_line(aes(y = Var_15ma, color = 'moving mean'), size = 0.8) + 
-      scale_color_manual('', values = c('black','grey50'))
-    
-    print(p)
-    
-    return(DF)
-  }
-  ```
-  
-The final method we will look at is the moving average method. As the name already states, here the extremes are detected on a more temporally constrained basis, the moving average around each datapoint. Take a look at the code block above for the moving average method. Everything used here was already used in the blocks before, only the deviation from the mean (the "del_var") is now computed differently.  
+
+The final method we will look at is the moving average method. As the name already states, here the extremes are detected on a more temporally constrained basis, the moving average around each datapoint. Take a look at the code block for the block-maxima method. Everything we need for the moving average method is already in there. This time, try to write the method all by yourself. It is really not hard. You just need to figure out, which data you need to subtract to get the "diff" column right. As a little hint: You don't need the day_of_year information here anymore at all.  
 
 ----
 
 ### Exercises
 
-1. Think about how using a smaller time reference window might affect the extreme value detection. Would you expect extreme values in this approach to be more or less frequent than in the block averaging method? Then run the detection function and save the output in a new variable. Finally use the given evaluation function ```Total_Extremes()``` and pass it the output. Was your guess right?  
-2. You have now run all three methods. In the evaluation functions you have a given function ```Plot_All_Extremes()```. Call it with your POT, BA and MA outputs as arguments and look at the temperature ranges which where categorized as extreme values. Write up a very short summarization.   
+1. Think about how using a smaller time reference window might affect the extreme value detection. Would you expect extreme values in this approach to be more or less frequent than in the block averaging method? Then run the detection function and save the output in a new variable.
+2. You have now run all three methods. How do you think does the distribution look for the moving average? Use your plotting function from before to check your hypothesis. 
 3. Change the parameter rollmean_period of the extreme detection function with the MA method to 365 and pass that output to the ```Plot_All_Extremes()``` function. How do you explain the output in comparison to the other methods?  
 
 ----
