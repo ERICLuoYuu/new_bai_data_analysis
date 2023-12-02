@@ -141,12 +141,6 @@ def peak_over_threshold(X:pd.Series, prob):
 
 {::options parse_block_html="false" /}
 
-{% endcapture %}
-
-<div class="notice--primary">
-  {{ exercise | markdownify }}
-</div>
-
 For this and the next methods it will be very handy to have a function that plots the data and the extreme highs and lows in separate colors. You can try to build a nice plotly figure yourself or you use the code I provide below.
 
 {::options parse_block_html="true" /}
