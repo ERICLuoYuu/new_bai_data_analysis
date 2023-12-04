@@ -197,7 +197,7 @@ Which questions could you answer with this type of extreme detection, which not?
 
 
 <h3> Exercise </h3>
-<p>Lets fiddle with the code for a bit. Change the **prob** parameter to 85, 75 and see how the output changes. How many extreme values do you expect when setting prob to 50? Think about it and then run the function with that quantile. <br>
+<p>Lets fiddle with the code for a bit. Change the <b>prob</b> parameter to 85, 75 and see how the output changes. How many extreme values do you expect when setting prob to 50? Think about it and then run the function with that quantile. <br>
 
 {% endcapture %}
 
