@@ -106,11 +106,11 @@ Define a new function called "peak_over_threshold()". <br>
 It needs to take a series of data as input and the quantile we want to use for extreme detection. <br>
 Then we need to do the following operations: <br>
 <ol>
-  <li>Find the upper and lower thresholds for what is to be defined as extreme, absed on the quantiles. To find these values you can use the handy Python function "quantiles()". Just call it on the input Series and provide the quantiles as argument as in "X.quantiles(0.95)". Remember: You want the upper **and lower** thresholds. Think about how you can get both.
-Then create a dataframe to return with two new columns: One called
-  <li> Find those rows in the input series which are higher and lower than the upper and lower thresholds. You can get Series of booleans by comparing a pandas Series with a value. You can try it out, just type for example "X > 270" if X is your Series.
-  <li> Finally you want to create a dataframe, because of course you want to return the results of your extreme value detection. Create a dataframe with the input data and two new columns, one containing the booleans of your high extreme values and the other for the low extremes.
+  <li>Find the upper and lower thresholds for what is to be defined as extreme, absed on the quantiles. To find these values you can use the handy Python function "quantiles()". Just call it on the input Series and provide the quantiles as argument as in "X.quantiles(0.95)". Remember: You want the upper **and lower** thresholds. Think about how you can get both. </li>
+  <li> Find those rows in the input series which are higher and lower than the upper and lower thresholds. You can get Series of booleans by comparing a pandas Series with a value. You can try it out, just type for example "X > 270" if X is your Series. </li>  
+  <li> Finally you want to create a dataframe, because of course you want to return the results of your extreme value detection. Create a dataframe with the input data and two new columns, one containing the booleans of your high extreme values and the other for the low extremes. </li>
 </ol>
+
 A little hint: The description here is quite long but the code for this is actually quite short.
 
 {::options parse_block_html="true" /}
