@@ -21,6 +21,7 @@ value (extreme relative to what?). Afterwards we will work with an example datas
 ### 1. Material
 We will once again use the DWD dataset from the Diepholz station for this section. Below you can find the download again:
 [Diepholz DWD meteo data (25mb)...](assets/data/dwd_diepholz_1996_2023.parquet).  
+[Click here to download (25mb)...](assets/data/dwd_diepholz_1996_2023.parquet)  
 [Literatur](/assets/r_ex4/wmo-td_1500_en.pdf)  
 
 We will have to do some plotting again, so it might be good for you to resample the data to daily data, just to reduce the size
@@ -90,7 +91,7 @@ get_quantiles(df_dwd_ta_hourly, 0.05, 0.95)
 
 Alright, now that we layed out the basics, lets dive into theme methods!  
 
-![extreme Meme](assets\images\python\4\extreme_meme.png)  
+![extreme Meme](assets/images/python/4/extreme_meme.png)  
 
 #### 3.1 Peak Over Threshold (POT)
 
