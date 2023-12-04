@@ -1,6 +1,6 @@
 ---
 title: "4. Extreme value detection"
-permalink: /python_4_extreme_detection
+permalink: python_4_extreme_detection
 author_profile: false
 sidebar:
   nav: "python"
@@ -104,24 +104,23 @@ The boundaries are usually defined by the quantiles we provided as an argument t
 <p >Lets try and code that method ourselves. It is actually not very difficult! <br>
 Define a new function called "peak_over_threshold()". <br> 
 It needs to take a series of data as input and the quantile we want to use for extreme detection. <br>
-Then we need to do the following operations: <br>
+Then we need to do the following operations: </p>
 <ol>
   <li>Find the upper and lower thresholds for what is to be defined as extreme, absed on the quantiles. To find these values you can use the handy Python function "quantiles()". Just call it on the input Series and provide the quantiles as argument as in "X.quantiles(0.95)". Remember: You want the upper **and lower** thresholds. Think about how you can get both. </li>
   <li> Find those rows in the input series which are higher and lower than the upper and lower thresholds. You can get Series of booleans by comparing a pandas Series with a value. You can try it out, just type for example "X > 270" if X is your Series. </li>  
   <li> Finally you want to create a dataframe, because of course you want to return the results of your extreme value detection. Create a dataframe with the input data and two new columns, one containing the booleans of your high extreme values and the other for the low extremes. </li>
 </ol>
 
-A little hint: The description here is quite long but the code for this is actually quite short.
-
+A little hint: The description here is quite long but the code for this is actually quite short.  
+  
 {::options parse_block_html="true" /}
 
 <details><summary markdown="span">Hint if you get stuck!</summary>
 You can generate a Series of boolean values that indicate whether a datapoint is above or below a value with a direct comparison such as 
 ```python
-    X_larger_than_280 = X > 280
+X_larger_than_280 = X > 280
 ```
 </details>
-
 
 <details><summary markdown="span">Solution!</summary>
 
@@ -137,18 +136,14 @@ def peak_over_threshold(X:pd.Series, prob):
     })
     return df
 ```
+
 </details>
 
-{::options parse_block_html="false" /}
-
 For this and the next methods it will be very handy to have a function that plots the data and the extreme highs and lows in separate colors. You can try to build a nice plotly figure yourself or you use the code I provide below.
-
-{::options parse_block_html="true" /}
 
 <details><summary markdown="span">Plot function</summary>
 
 ```python
-
 def plot_extremes(data:pd.DataFrame, extr_high_col:str, extr_low_col:str):
     extr_high_data = data.loc[data[extr_high_col]==True, "data"]
     extr_low_data = data.loc[data[extr_low_col]==True, "data"]
@@ -193,7 +188,7 @@ def plot_extremes(data:pd.DataFrame, extr_high_col:str, extr_low_col:str):
     
 ```
 </details>
-
+  
 {::options parse_block_html="false" /}
 
 Take a look at the output and the datapoints marked as extreme values. 
