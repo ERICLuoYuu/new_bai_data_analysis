@@ -204,7 +204,7 @@ def find_extremes_by_block_maxima(X:pd.Series, prob:float):
         "data":X.values,
         "data_14d_ma": X.rolling(window=14, min_periods=1, center=True).mean()
     })
-    long_term_means = df_bm.groupby("doy")["data"].mean()
+    long_term_means = df_bm.groupby("doy")["data_14d_ma"].mean()
 
     df_bm["diff"] = np.zeros(len(X))
     for row, index in df_bm.iterrows():

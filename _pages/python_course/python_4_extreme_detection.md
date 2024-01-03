@@ -205,7 +205,6 @@ Which questions could you answer with this type of extreme detection, which not?
   {{ exercise | markdownify }}
 </div>
 
-
 ----------
 
 #### 3.2. Block Maxima Method (BM)
@@ -228,7 +227,7 @@ df_bm = pd.DataFrame(index=X.index, data={
 Next we create the column "data_14d_ma". This is the 15 day moving average around every day. Moving average means that the "window" of data we are calculating the mean from varies.
 
 ```python
-df_bm["data_14d_ma"] = X.rolling(window=14, min_periods=1, center=True)
+df_bm["data_14d_ma"] = X.rolling(window=14, min_periods=1, center=True).mean()
 ```  
 
 Through this, we accquire a smoothing of the daily temperature values and make the underlying dataset for our daily temperature distribution more broad. The reasoning is the following:  
@@ -238,7 +237,7 @@ We want to create a representative dataset for daily temperature values across t
 Now that we have the smoothed data and our doy information we can go ahead and calculate the long-term mean for every day of the year. To do so, we use the pandas "groupby" function. This allows us to sample data based on common values in a column. E.g. for the day of the year, it will grab all values where the day of the year is 1 and calculate the mean for those, then for day 2 and so on.  
 
 ```python
-long_term_means = df_bm.groupby("doy")["data"].mean()
+long_term_means = df_bm.groupby("doy")["data_14d_ma"].mean()
 ```  
 Now that we have those long term means, we can calculate the difference between every datapoint and the long-term mean that fits to its day of the year. To make it more clear, we can use the pandas "iterrows" function that allows us to loop through the rows of the dataframe.
 First we create a new column filled with zeros called "diff". Then we go through the rows of the dataframe, grab that long-term mean value by its index that corresponds to the "doy" of the current row (done with long_term_means.index == df_bm.loc[row,"doy"]). Then we subtract that long-term mean from that corresponding datapoint.
