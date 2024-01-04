@@ -242,7 +242,7 @@ long_term_means = df_bm.groupby("doy")["data_14d_ma"].mean()
 Now that we have those long term means, we can calculate the difference between every datapoint and the long-term mean that fits to its day of the year. To make it more clear, we can use the pandas "iterrows" function that allows us to loop through the rows of the dataframe.
 First we create a new column filled with zeros called "diff". Then we go through the rows of the dataframe, grab that long-term mean value by its index that corresponds to the "doy" of the current row (done with long_term_means.index == df_bm.loc[row,"doy"]). Then we subtract that long-term mean from that corresponding datapoint.
 ```python
-df_bm["diff"] = np.zeros(len(X))
+df_bm["diff"] = np.zeros(len(df_bm))
 for row, index in df_bm.iterrows():
     ltm = long_term_means[long_term_means.index == df_bm.loc[row,"doy"]]
     diff = df_bm.loc[row,"data"] - ltm
