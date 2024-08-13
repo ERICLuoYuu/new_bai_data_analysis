@@ -34,7 +34,7 @@ GEM
       faraday-net_http (>= 2.0, < 3.1)
       ruby2_keywords (>= 0.0.4)
     faraday-net_http (3.0.2)
-    ffi (1.15.5)
+    ffi (1.15.5-x64-mingw-ucrt)
     filesize (0.2.0)
     forwardable-extended (2.6.0)
     gemoji (3.0.1)
@@ -266,10 +266,10 @@ GEM
       tzinfo (>= 1.0.0)
     unf (0.1.4)
       unf_ext
-    unf_ext (0.0.8.2)
+    unf_ext (0.0.8.2-x64-mingw-ucrt)
     unicode-display_width (1.8.0)
     verbal_expressions (0.1.5)
-    wdm (0.1.1)
+    wdm (0.2.0)
     webrick (1.8.1)
 
 PLATFORMS
@@ -285,8 +285,11 @@ DEPENDENCIES
   jekyll-sitemap
   jemoji
   tzinfo-data
-  wdm (~> 0.1.0)
+  wdm (~> 0.2.0)
   webrick (~> 1.8)
+
+RUBY VERSION
+   ruby 3.1.6p260
 
 BUNDLED WITH
    2.4.18
