@@ -1,6 +1,8 @@
 ---
 layout: home
-author_profile: true
+author_profile: false
+# Add this line to remove the recent posts list:
+entries_layout: grid
 ---
 # Yu Luo - GIS and Environmental Science
 
