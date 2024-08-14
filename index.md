@@ -1,6 +1,6 @@
 ---
 layout: home
-author_profile: false
+author_profile: true
 # Add this line to remove the recent posts list:
 entries_layout: grid
 ---
