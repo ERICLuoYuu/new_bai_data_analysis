@@ -57,15 +57,6 @@ plugins:
   - jemoji
   - jekyll-include-cache
 
-author:
-  name   : "Iron Man"
-  avatar : "/assets/images/bio-photo.jpg"
-  bio    : "Hello, I'm Tony Stark, better known as Iron Man. I'm a genius billionaire, playboy, philanthropist, and the former CEO of Stark Industries. I built my first Iron Man suit in a cave with a box of scraps, and since then, I've used my cutting-edge technology to protect the world as a founding member of the Avengers. I'm always ready to suit up, face any challenge, and make sure the bad guys know that you don't mess with Iron Man."
-  links:
-    - label: "GitHub"
-      icon: "fab fa-fw fa-github"
-      url: "https://github.com/nicbehr"
-
 
 footer:
   links:
