@@ -1,7 +1,7 @@
 main:
   - title: "Python for Ecologists"
     url:  python_0_landing_page
-    - title: "About"
+  - title: "About"
     url:  about
 
 
