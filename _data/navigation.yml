@@ -1,20 +1,9 @@
 main:
   - title: "Python for Ecologists"
     url:  python_0_landing_page
-  - title: "R for Ecologists"
-    url: /1_r_basics/
-  - title: "About"
+    - title: "About"
     url:  about
 
-r:
-  - title: "Basics of R"
-    url: /1_r_basics/
-  - title: "Data Visualization"
-    url: /2_r_data_viz/
-  - title: "Interpolation and Gap Filling"
-    url: /3_r_interp_gapfil/
-  - title: "Extreme Value Detection"
-    url: "/4_r_extreme_detection/"
 
 python:
   - title: "0. Installation"

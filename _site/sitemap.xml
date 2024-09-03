@@ -1,25 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9 http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd" xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 <url>
-<loc>http://localhost:4000/1_r_basics/</loc>
-</url>
-<url>
-<loc>http://localhost:4000/2_r_data_viz/</loc>
-</url>
-<url>
-<loc>http://localhost:4000/3_r_interp_gapfil/</loc>
-</url>
-<url>
-<loc>http://localhost:4000/4_r_extreme_detection/</loc>
-</url>
-<url>
 <loc>http://localhost:4000/about</loc>
 </url>
 <url>
 <loc>http://localhost:4000/categories/</loc>
 </url>
 <url>
-<loc>http://localhost:4000/0_r_landing_page</loc>
+<loc>http://localhost:4000/python_0_installation</loc>
 </url>
 <url>
 <loc>http://localhost:4000/python_0_installation</loc>
