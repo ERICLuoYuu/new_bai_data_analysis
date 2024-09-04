@@ -3,7 +3,7 @@ title: "Installing Python"
 permalink: python_0_installation
 author_profile: false
 sidebar:
-  nav: "python"
+  nav: home
 ---
 
 For this course we will use a very handy tool called Anaconda. It is basically Python in a box, meaning that it creates a closed environment on your PC which already has Python and a lot of extra packages as well as additional software such as a code editor installed on it. This makes the installation as easy as it gets. The downside is that the installer is quite large (>800mb).  
